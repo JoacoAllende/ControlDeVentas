@@ -34,6 +34,7 @@ productoCtrl.updateProducto = (req, res) => {
 productoCtrl.deleteProducto = (req, res) => {
     const id = req.params.id;
     const query = 'DELETE FROM producto WHERE id = ' + id;
+    console.log(query);
     mysqlConnection.query(query, (err, rows, fields) =>{
         res.json('deleted');
     })
