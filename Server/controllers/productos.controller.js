@@ -15,7 +15,8 @@ productoCtrl.getProductos = (req, res) => {
 
 productoCtrl.createProducto = (req, res) => {
     const producto = req.body;
-    const query = 'INSERT INTO producto (descripcion, precio) VALUES ("' + producto.descripcion + '", ' + producto.precio + ');';
+    const query = 'INSERT INTO producto (codigo, descripcion, precio) VALUES ("' + producto.codigo + '","' + producto.descripcion
+    + '", ' + producto.precio + ');';
     mysqlConnection.query(query, (req, rows, fields) => {        
         res.json({
             'status' : 'created'
@@ -25,7 +26,8 @@ productoCtrl.createProducto = (req, res) => {
 
 productoCtrl.updateProducto = (req, res) => {
     const producto = req.body;
-    const query = 'UPDATE producto SET descripcion = "' + producto.descripcion + '", precio = ' + producto.precio + ' WHERE id = ' + producto.id;
+    const query = 'UPDATE producto SET codigo = "' + producto.codigo + '", descripcion = "' + producto.descripcion + '", precio = ' +
+    producto.precio + ' WHERE id = ' + producto.id;
     mysqlConnection.query(query, (err, rows, fields) => {
         res.json('updated');
     })
