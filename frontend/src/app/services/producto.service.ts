@@ -12,7 +12,7 @@ export class ProductoService {
 
   constructor(private http : HttpClient) {
     this.productos = [];
-    this.selectedProducto = new Producto;
+    this.selectedProducto = new Producto(null,"","",null);
    }
 
    postProducto(producto : Producto){

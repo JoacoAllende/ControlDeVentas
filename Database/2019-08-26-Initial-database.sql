@@ -7,7 +7,7 @@ CREATE TABLE producto (
     id INT(4) AUTO_INCREMENT PRIMARY KEY,
     codigo INT(15);
     descripcion VARCHAR(80) NOT NULL,
-    precio NUMERIC NOT NULL
+    precio NUMERIC(5,2) NOT NULL
 );
 
 CREATE TABLE venta (
