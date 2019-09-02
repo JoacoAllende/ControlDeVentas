@@ -1,11 +1,11 @@
 <div class="container">
     <h1 class="text-center">PRODUCTOS</h1>
     <div class="container">
-        <table class="table">
+        <table class="table" id="productoTable">
             <thead class="text-center">
-                <th>Código</th>
-                <th>Descripción</th>
-                <th>Precio</th>
+                <th (click)="sortTable(0)">Código</th>
+                <th (click)="sortTable(1)">Descripción</th>
+                <th >Precio</th>
                 <th>Editar</th>
                 <th>Eliminar</th>
             </thead>
