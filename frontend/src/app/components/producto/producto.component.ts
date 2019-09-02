@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { NgForm } from '@angular/forms';
 import { Producto } from 'src/app/models/producto';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-producto',
@@ -10,12 +11,73 @@ import { Producto } from 'src/app/models/producto';
 })
 export class ProductoComponent implements OnInit {
 
+
+  public productosObs: Observable<Producto[]>;
+  public productos: Producto[] = [];
   actualPage : number = 1;
+  ordenCodigo = true;
+  ordenDescripciones = true;
+  ordenPrecio = true;
 
   constructor(private productoService : ProductoService) { }
 
   ngOnInit() {
-    this.getProductos();
+    this.productosObs = this.productoService.getProductos();
+    this.productosObs.forEach(element => {
+      element.forEach(element => {
+        this.productos.push(new Producto(element.id, element.descripcion, element.codigo, element.precio));
+      });
+    })
+  }
+
+  ordenarPrecios(){
+    if (this.ordenPrecio){
+      this.productos.sort(this.compararPrecio);
+      this.ordenPrecio = false;
+    } else {
+      this.productos.sort(this.compararPrecio);
+      this.productos.reverse();
+      this.ordenPrecio = true;
+    }
+  }
+
+  ordenarCodigos(){
+    if (this.ordenCodigo){
+      this.productos.sort(this.compararCodigo);
+      this.ordenCodigo = false;
+    } else {
+      this.productos.sort(this.compararCodigo);
+      this.productos.reverse();
+      this.ordenCodigo = true;
+    }
+  }
+
+  ordenarDescripciones(){
+    if (this.ordenDescripciones) {
+      this.productos.sort(this.compararDescripciones);
+      this.ordenDescripciones = false;
+    } else {
+      this.productos.sort(this.compararDescripciones);
+      this.productos.reverse();
+      this.ordenDescripciones = true;
+    }
+  }
+
+  compararDescripciones (a, b) {
+    if (a.descripcion.toLowerCase() > b.descripcion.toLowerCase())
+      return 1;
+    else if (a.descripcion.toLowerCase() < b.descripcion.toLowerCase())
+      return -1;
+    else
+      return 0;
+  }
+
+  compararPrecio (a, b) {
+    return b.precio - a.precio;
+  }
+
+  compararCodigo (a, b) {
+    return b.codigo - a.codigo;
   }
 
   getProductos(){
@@ -73,42 +135,5 @@ export class ProductoComponent implements OnInit {
     }
     this.addProducto(form);
    }
-
-   sortTable(n) {
-    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById("productoTable");
-    switching = true;
-    dir = "asc"; 
-    while (switching) {
-      switching = false;
-      rows = table.rows;
-      for (i = 0; i < (rows.length - 1); i++) {
-        shouldSwitch = false;
-        x = rows[i].getElementsByTagName("TD")[n];
-        y = rows[i + 1].getElementsByTagName("TD")[n];
-        if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
-        }
-      }
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        switchcount ++; 
-      } else {
-        if (switchcount == 0 && dir == "asc") {
-          dir = "desc";
-          switching = true;
-        }
-      }
-    }
-  }
 
 }

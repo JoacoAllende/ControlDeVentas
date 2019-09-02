@@ -24,7 +24,8 @@ export class ProductoService {
    }
 
    getProductos(){
-    return this.http.get(`http://localhost:3000/productos`);
+    return this.http.get<Producto[]>(`http://localhost:3000/productos`)
+    .pipe()
    }
 
    deleteProducto(id: number){

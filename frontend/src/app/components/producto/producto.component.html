@@ -3,14 +3,14 @@
     <div class="container">
         <table class="table" id="productoTable">
             <thead class="text-center">
-                <th (click)="sortTable(0)">Código</th>
-                <th (click)="sortTable(1)">Descripción</th>
-                <th >Precio</th>
+                <th (click)="ordenarCodigos()" class="pointer">Código</th>
+                <th (click)="ordenarDescripciones()" class="pointer">Descripción</th>
+                <th (click)="ordenarPrecios()" class="pointer">Precio</th>
                 <th>Editar</th>
                 <th>Eliminar</th>
             </thead>
             <tbody>
-                <tr *ngFor="let producto of productoService.productos | paginate : {itemsPerPage : 4, currentPage: ActualPage, nextLabel: 'Siguiente'}">
+                <tr *ngFor="let producto of productos | paginate: { itemsPerPage: 4, currentPage: actualPage}">
                     <td>{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
                     <td>{{producto.precio}}</td>
@@ -23,7 +23,7 @@
                 </tr>
             </tbody>
         </table>
-        <pagination-controls (pageChange)="ActualPage = $event"></pagination-controls>
+        <pagination-controls (pageChange)="actualPage = $event"></pagination-controls>
     </div>
     <form role="form" #productoForm="ngForm" name='productoForm'>
         <input type="hidden" name="id" [(ngModel)]="productoService.selectedProducto.id" #id="ngModel" >
