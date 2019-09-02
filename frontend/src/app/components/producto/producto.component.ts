@@ -10,6 +10,8 @@ import { Producto } from 'src/app/models/producto';
 })
 export class ProductoComponent implements OnInit {
 
+  actualPage : number = 1;
+
   constructor(private productoService : ProductoService) { }
 
   ngOnInit() {

@@ -10,7 +10,7 @@
                 <th>Eliminar</th>
             </thead>
             <tbody>
-                <tr *ngFor="let producto of productoService.productos">
+                <tr *ngFor="let producto of productoService.productos | paginate : {itemsPerPage : 4, currentPage: ActualPage, nextLabel: 'Siguiente'}">
                     <td>{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
                     <td>{{producto.precio}}</td>
@@ -23,6 +23,7 @@
                 </tr>
             </tbody>
         </table>
+        <pagination-controls (pageChange)="ActualPage = $event"></pagination-controls>
     </div>
     <form role="form" #productoForm="ngForm" name='productoForm'>
         <input type="hidden" name="id" [(ngModel)]="productoService.selectedProducto.id" #id="ngModel" >
