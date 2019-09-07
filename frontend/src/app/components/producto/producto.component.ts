@@ -16,18 +16,14 @@ export class ProductoComponent implements OnInit {
   public productos: Producto[] = [];
   actualPage : number = 1;
   ordenCodigo = true;
-  ordenDescripciones = true;
+  ordenDescripciones = false;
   ordenPrecio = true;
 
   constructor(private productoService : ProductoService) { }
 
   ngOnInit() {
     this.productosObs = this.productoService.getProductos();
-    this.productosObs.forEach(element => {
-      element.forEach(element => {
-        this.productos.push(new Producto(element.id, element.descripcion, element.codigo, element.precio));
-      });
-    })
+    this.productosObs.subscribe(prod => this.productos = prod);
   }
 
   ordenarPrecios(){
@@ -96,14 +92,16 @@ export class ProductoComponent implements OnInit {
       this.productoService.postProducto(form.value)
       .subscribe(res => {
         this.resetForm(form);
-        this.getProductos();
+        this.productosObs = this.productoService.getProductos();
+        this.productosObs.subscribe(prod => this.productos = prod);
       })
     }
     else {
       this.productoService.putProducto(form.value)
       .subscribe(res => {
         this.resetForm(form);
-        this.getProductos();
+        this.productosObs = this.productoService.getProductos();
+        this.productosObs.subscribe(prod => this.productos = prod);
       })
     }
   }
@@ -112,7 +110,8 @@ export class ProductoComponent implements OnInit {
     if (confirm('Desea eliminar el producto?')){
       this.productoService.deleteProducto(id)
       .subscribe(res => {
-        this.getProductos();
+        this.productosObs = this.productoService.getProductos();
+        this.productosObs.subscribe(prod => this.productos = prod);
       })
     }
   }
