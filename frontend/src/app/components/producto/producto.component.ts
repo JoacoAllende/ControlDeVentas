@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ɵConsole } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { NgForm } from '@angular/forms';
 import { Producto } from 'src/app/models/producto';
@@ -11,13 +11,22 @@ import { Observable } from 'rxjs';
 })
 export class ProductoComponent implements OnInit {
 
-
+  //PRODUCTOS
   public productosObs: Observable<Producto[]>;
   public productos: Producto[] = [];
+  //PAGINACIÓN
   actualPage : number = 1;
+  //ÓRDENES
   ordenCodigo = true;
   ordenDescripciones = false;
   ordenPrecio = true;
+  //ELEMENTOS DEL COMPONENTE
+  edicion = false;
+  inicial = true;
+  busqueda = false;
+  //FILTRO PIPE
+  busquedaCodigo: string;
+  busquedaDescripcion: string;
 
   constructor(private productoService : ProductoService) { }
 
@@ -25,6 +34,8 @@ export class ProductoComponent implements OnInit {
     this.productosObs = this.productoService.getProductos();
     this.productosObs.subscribe(prod => this.productos = prod);
   }
+
+  // DISTINTOS ÓRDENES
 
   ordenarPrecios(){
     if (this.ordenPrecio){
@@ -75,6 +86,8 @@ export class ProductoComponent implements OnInit {
   compararCodigo (a, b) {
     return b.codigo - a.codigo;
   }
+
+  // ALTA, BAJA Y MODIFICACIÓN DE PRODUCTOS
 
   getProductos(){
     this.productoService.getProductos()
@@ -133,6 +146,27 @@ export class ProductoComponent implements OnInit {
         }
     }
     this.addProducto(form);
+   }
+
+   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
+
+   habilitarEdicion(){
+     this.edicion = true;
+     this.inicial = false;
+   }
+
+   habilitarInicial(){
+    this.edicion = false;
+    this.busqueda = false;
+    this.inicial = true;
+    this.productosObs.subscribe(prod => this.productos = prod);
+    this.busquedaCodigo = '';
+    this.busquedaDescripcion = '';
+   }
+
+   habilitarBusqueda(){
+     this.busqueda = true;
+     this.inicial = false;
    }
 
 }

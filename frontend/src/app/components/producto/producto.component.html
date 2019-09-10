@@ -1,23 +1,32 @@
 <div class="container">
     <h1 class="text-center">PRODUCTOS</h1>
     <div class="container">
+        <div *ngIf="busqueda">
+            <div class="col-md-6 form-group">
+                <input type="text" placeholder="Ingresar Código" [(ngModel)]="busquedaCodigo">
+            </div>
+            <div class="col-md-6 form-group">
+                <input type="text" placeholder="Ingresar Descripción" [(ngModel)]="busquedaDescripcion">
+            </div>
+            <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial()">Salir</button>
+        </div>
         <table class="table" id="productoTable">
             <thead class="text-center">
                 <th (click)="ordenarCodigos()" class="pointer">Código</th>
                 <th (click)="ordenarDescripciones()" class="pointer">Descripción</th>
                 <th (click)="ordenarPrecios()" class="pointer">Precio</th>
-                <th>Editar</th>
-                <th>Eliminar</th>
+                <th *ngIf="edicion">Editar</th>
+                <th *ngIf="edicion">Eliminar</th>
             </thead>
             <tbody>
-                <tr *ngFor="let producto of productos | paginate: { itemsPerPage: 4, currentPage: actualPage}">
+                <tr *ngFor="let producto of productos | codigoFilter:busquedaCodigo | descripcionFilter:busquedaDescripcion | paginate: { itemsPerPage: 4, currentPage: actualPage}">
                     <td>{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
                     <td>{{producto.precio}}</td>
-                    <td><a (click)="editProducto(producto)">
+                    <td><a (click)="editProducto(producto)" *ngIf="edicion">
                         <i class="glyphicon glyphicon-pencil"></i>
                     </a></td>
-                    <td><a (click)="deleteProducto(producto.id)">
+                    <td><a (click)="deleteProducto(producto.id)" *ngIf="edicion">
                         <i class="glyphicon glyphicon-remove"></i>
                     </a></td>
                 </tr>
@@ -25,7 +34,7 @@
         </table>
         <pagination-controls (pageChange)="actualPage = $event"></pagination-controls>
     </div>
-    <form role="form" #productoForm="ngForm" name='productoForm'>
+    <form role="form" #productoForm="ngForm" name='productoForm' *ngIf="edicion">
         <input type="hidden" name="id" [(ngModel)]="productoService.selectedProducto.id" #id="ngModel" >
         <div class="form-group">
             <label for="Codigo">Código</label>
@@ -44,9 +53,8 @@
         </div>
         <button type="submit" class="btn btn-default" (click)="CheckValidation(productoForm)">Enviar</button>
         <button type="submit" class="btn btn-default" (click)="resetForm(productoForm)">Limpiar</button>
-        <div class="espacio"></div>
-        <div class="espacio"></div>
-        <div class="espacio"></div>
-        <div class="espacio"></div> 
+        <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial()">Salir</button>
     </form>
+    <button type="submit" class="btn btn-default pull-right" (click)="habilitarBusqueda()" *ngIf="inicial">Buscar</button>
+    <button type="submit" class="btn btn-default pull-right" (click)="habilitarEdicion()" *ngIf="inicial">Editar</button>
 </div>

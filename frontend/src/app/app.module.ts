@@ -6,11 +6,15 @@ import { AppComponent } from './app.component';
 import { ProductoComponent } from './components/producto/producto.component';
 import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
+import { ProductoFilterCodigoPipe } from './components/producto/producto-filter-codigo.pipe';
+import { ProductoFilterDescripcionPipe } from './components/producto/producto-filter-descripcion.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProductoComponent
+    ProductoComponent,
+    ProductoFilterCodigoPipe,
+    ProductoFilterDescripcionPipe
   ],
   imports: [
     BrowserModule,
