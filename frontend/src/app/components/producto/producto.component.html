@@ -12,14 +12,14 @@
         </div>
         <table class="table" id="productoTable">
             <thead class="text-center">
-                <th (click)="ordenarCodigos()" class="pointer">Código</th>
-                <th (click)="ordenarDescripciones()" class="pointer">Descripción</th>
-                <th (click)="ordenarPrecios()" class="pointer">Precio</th>
+                <th (click)="setOrder('codigo')" class="pointer">Código</th>
+                <th (click)="setOrder('descripcion')" class="pointer">Descripción</th>
+                <th (click)="setOrder('precio')" class="pointer">Precio</th>
                 <th *ngIf="edicion">Editar</th>
                 <th *ngIf="edicion">Eliminar</th>
             </thead>
             <tbody>
-                <tr *ngFor="let producto of productos | codigoFilter:busquedaCodigo | descripcionFilter:busquedaDescripcion | paginate: { itemsPerPage: 4, currentPage: actualPage}">
+                <tr *ngFor="let producto of productos | orderBy: order:reverse:'case-insensitive' | codigoFilter:busquedaCodigo | descripcionFilter:busquedaDescripcion| paginate: { itemsPerPage: 4, currentPage: actualPage}">
                     <td>{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
                     <td>{{producto.precio}}</td>

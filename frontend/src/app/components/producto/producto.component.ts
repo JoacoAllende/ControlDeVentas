@@ -1,4 +1,4 @@
-import { Component, OnInit, ɵConsole } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ProductoService } from '../../services/producto.service';
 import { NgForm } from '@angular/forms';
 import { Producto } from 'src/app/models/producto';
@@ -16,10 +16,9 @@ export class ProductoComponent implements OnInit {
   public productos: Producto[] = [];
   //PAGINACIÓN
   actualPage : number = 1;
-  //ÓRDENES
-  ordenCodigo = true;
-  ordenDescripciones = false;
-  ordenPrecio = true;
+  //ORDEN
+  order: string = 'descripcion';
+  reverse: boolean = false;
   //ELEMENTOS DEL COMPONENTE
   edicion = false;
   inicial = true;
@@ -37,54 +36,11 @@ export class ProductoComponent implements OnInit {
 
   // DISTINTOS ÓRDENES
 
-  ordenarPrecios(){
-    if (this.ordenPrecio){
-      this.productos.sort(this.compararPrecio);
-      this.ordenPrecio = false;
-    } else {
-      this.productos.sort(this.compararPrecio);
-      this.productos.reverse();
-      this.ordenPrecio = true;
+  setOrder(value: string) {
+    if (this.order === value) {
+      this.reverse = !this.reverse;
     }
-  }
-
-  ordenarCodigos(){
-    if (this.ordenCodigo){
-      this.productos.sort(this.compararCodigo);
-      this.ordenCodigo = false;
-    } else {
-      this.productos.sort(this.compararCodigo);
-      this.productos.reverse();
-      this.ordenCodigo = true;
-    }
-  }
-
-  ordenarDescripciones(){
-    if (this.ordenDescripciones) {
-      this.productos.sort(this.compararDescripciones);
-      this.ordenDescripciones = false;
-    } else {
-      this.productos.sort(this.compararDescripciones);
-      this.productos.reverse();
-      this.ordenDescripciones = true;
-    }
-  }
-
-  compararDescripciones (a, b) {
-    if (a.descripcion.toLowerCase() > b.descripcion.toLowerCase())
-      return 1;
-    else if (a.descripcion.toLowerCase() < b.descripcion.toLowerCase())
-      return -1;
-    else
-      return 0;
-  }
-
-  compararPrecio (a, b) {
-    return b.precio - a.precio;
-  }
-
-  compararCodigo (a, b) {
-    return b.codigo - a.codigo;
+    this.order = value;
   }
 
   // ALTA, BAJA Y MODIFICACIÓN DE PRODUCTOS

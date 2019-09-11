@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ProductoFilterCodigoPipe } from './components/producto/producto-filter-codigo.pipe';
 import { ProductoFilterDescripcionPipe } from './components/producto/producto-filter-descripcion.pipe';
+import { OrderModule } from 'ngx-order-pipe';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { ProductoFilterDescripcionPipe } from './components/producto/producto-fi
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    OrderModule
   ],
   providers: [],
   bootstrap: [AppComponent]
