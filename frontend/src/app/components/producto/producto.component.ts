@@ -61,16 +61,24 @@ export class ProductoComponent implements OnInit {
       this.productoService.postProducto(form.value)
       .subscribe(res => {
         this.resetForm(form);
-        this.productosObs = this.productoService.getProductos();
-        this.productosObs.subscribe(prod => this.productos = prod);
+        if (res == 1062) {
+          alert('No pudo crearse el producto. Ya existía un producto con el código ingresado.')
+        } else {
+          this.productosObs = this.productoService.getProductos();
+          this.productosObs.subscribe(prod => this.productos = prod);
+        }
       })
     }
     else {
       this.productoService.putProducto(form.value)
       .subscribe(res => {
         this.resetForm(form);
-        this.productosObs = this.productoService.getProductos();
-        this.productosObs.subscribe(prod => this.productos = prod);
+        if (res == 1062) {
+          alert('No pudo actualizarse el producto. Ya existía un producto con el código ingresado.')
+        } else {
+          this.productosObs = this.productoService.getProductos();
+          this.productosObs.subscribe(prod => this.productos = prod);
+        }
       })
     }
   }
@@ -94,10 +102,12 @@ export class ProductoComponent implements OnInit {
   CheckValidation(form : NgForm){
     var formulario = document.forms["productoForm"];
     for (let i = 0; i < formulario.length; i++){
-      if(formulario[i].type != 'hidden' && formulario[i].tagName == 'INPUT')
+      if(formulario[i].type != 'hidden' && formulario[i].tagName == 'INPUT') 
         if (formulario[i].value == '') {
           alert('Debe completarse el campo ' + formulario[i].name);
-          this.resetForm();
+          return;
+        } else if (formulario[i].name === 'precio' && formulario[i].value < 0) {
+          alert('No puede ingresarse valores negativos para el precio');
           return;
         }
     }
