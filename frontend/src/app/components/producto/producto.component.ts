@@ -64,7 +64,6 @@ export class ProductoComponent implements OnInit {
         if (res == 1062) {
           alert('No pudo crearse el producto. Ya existía un producto con el código ingresado.')
         } else {
-          this.productosObs = this.productoService.getProductos();
           this.productosObs.subscribe(prod => this.productos = prod);
         }
       })
@@ -76,7 +75,6 @@ export class ProductoComponent implements OnInit {
         if (res == 1062) {
           alert('No pudo actualizarse el producto. Ya existía un producto con el código ingresado.')
         } else {
-          this.productosObs = this.productoService.getProductos();
           this.productosObs.subscribe(prod => this.productos = prod);
         }
       })
@@ -87,7 +85,6 @@ export class ProductoComponent implements OnInit {
     if (confirm('Desea eliminar el producto?')){
       this.productoService.deleteProducto(id)
       .subscribe(res => {
-        this.productosObs = this.productoService.getProductos();
         this.productosObs.subscribe(prod => this.productos = prod);
       })
     }
