@@ -9,13 +9,22 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { ProductoFilterCodigoPipe } from './components/producto/producto-filter-codigo.pipe';
 import { ProductoFilterDescripcionPipe } from './components/producto/producto-filter-descripcion.pipe';
 import { OrderModule } from 'ngx-order-pipe';
+import { MainNavComponent } from './main-nav/main-nav.component';
+import { LayoutModule } from '@angular/cdk/layout';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProductoComponent,
     ProductoFilterCodigoPipe,
-    ProductoFilterDescripcionPipe
+    ProductoFilterDescripcionPipe,
+    MainNavComponent
   ],
   imports: [
     BrowserModule,
@@ -23,7 +32,14 @@ import { OrderModule } from 'ngx-order-pipe';
     FormsModule,
     HttpClientModule,
     NgxPaginationModule,
-    OrderModule
+    OrderModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
