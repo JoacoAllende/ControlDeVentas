@@ -22,7 +22,7 @@
                 <tr *ngFor="let producto of productos | orderBy: order:reverse:'case-insensitive' | codigoFilter:busquedaCodigo | descripcionFilter:busquedaDescripcion| paginate: { itemsPerPage: 4, currentPage: actualPage}">
                     <td>{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
-                    <td>{{producto.precio}}</td>
+                    <td>{{producto.precio  | number : '1.2-2'}}</td>
                     <td><a (click)="editProducto(producto)" *ngIf="edicion">
                         <i class="glyphicon glyphicon-pencil"></i>
                     </a></td>
