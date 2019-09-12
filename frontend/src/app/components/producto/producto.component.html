@@ -1,0 +1,60 @@
+<div class="container">
+    <h1 class="text-center">PRODUCTOS</h1>
+    <div class="container">
+        <div *ngIf="busqueda">
+            <div class="col-md-6 form-group">
+                <input type="text" placeholder="Ingresar Código" [(ngModel)]="busquedaCodigo">
+            </div>
+            <div class="col-md-6 form-group">
+                <input type="text" placeholder="Ingresar Descripción" [(ngModel)]="busquedaDescripcion">
+            </div>
+            <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial()">Salir</button>
+        </div>
+        <table class="table" id="productoTable">
+            <thead class="text-center">
+                <th (click)="setOrder('codigo')" class="pointer">Código</th>
+                <th (click)="setOrder('descripcion')" class="pointer">Descripción</th>
+                <th (click)="setOrder('precio')" class="pointer">Precio</th>
+                <th *ngIf="edicion">Editar</th>
+                <th *ngIf="edicion">Eliminar</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let producto of productos | orderBy: order:reverse:'case-insensitive' | codigoFilter:busquedaCodigo | descripcionFilter:busquedaDescripcion| paginate: { itemsPerPage: 10, currentPage: actualPage}">
+                    <td>{{producto.codigo}}</td>
+                    <td>{{producto.descripcion}}</td>
+                    <td>{{producto.precio  | number : '1.2-2'}}</td>
+                    <td><a (click)="editProducto(producto)" *ngIf="edicion">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </a></td>
+                    <td><a (click)="deleteProducto(producto.id)" *ngIf="edicion">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </a></td>
+                </tr>
+            </tbody>
+        </table>
+        <pagination-controls (pageChange)="actualPage = $event"></pagination-controls>
+    </div>
+    <form role="form" #productoForm="ngForm" name='productoForm' *ngIf="edicion">
+        <input type="hidden" name="id" [(ngModel)]="productoService.selectedProducto.id" #id="ngModel" >
+        <div class="form-group">
+            <label for="Codigo">Código</label>
+            <input type="text" class="form-control" name="codigo" [(ngModel)]="productoService.selectedProducto.codigo" #codigo="ngModel" 
+                placeholder="Codigo" required="required">
+        </div>
+        <div class="form-group">
+            <label for="Descripcion">Descripción</label>
+            <input type="text" class="form-control" name="descripcion" [(ngModel)]="productoService.selectedProducto.descripcion" #descripcion="ngModel" required
+                placeholder="Descripcion">
+        </div>
+        <div class="form-group">
+            <label for="Precio">Precio</label>
+            <input type="number" class="form-control" name="precio" [(ngModel)]="productoService.selectedProducto.precio" #precio="ngModel" required
+                placeholder="Precio">
+        </div>
+        <button type="submit" class="btn btn-default" (click)="CheckValidation(productoForm)">Enviar</button>
+        <button type="submit" class="btn btn-default" (click)="resetForm(productoForm)">Limpiar</button>
+        <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial()">Salir</button>
+    </form>
+    <button type="submit" class="btn btn-default pull-right" (click)="habilitarBusqueda()" *ngIf="inicial">Buscar</button>
+    <button type="submit" class="btn btn-default pull-right" (click)="habilitarEdicion()" *ngIf="inicial">Editar</button>
+</div>

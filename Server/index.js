@@ -1,7 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const app = express();
-// const cors = require('cors');
+const cors = require('cors');
 
 require('./database');
 
@@ -13,7 +13,7 @@ app.set('port', process.env.PORT || 3000);
 
 app.use(morgan('dev'));
 app.use(express.json());
-// app.use(cors({origin: 'http://localhost:4200'}))
+app.use(cors({origin: 'http://localhost:4200'}))
 
 // Routes
 
