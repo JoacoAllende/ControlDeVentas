@@ -2,7 +2,7 @@ const productoCtrl = {};
 
 const mysqlConnection = require('../database');
 
-productoCtrl.getProductos = (res) => {
+productoCtrl.getProductos = (req, res) => {
     const query = 'SELECT * FROM producto ORDER BY descripcion';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
