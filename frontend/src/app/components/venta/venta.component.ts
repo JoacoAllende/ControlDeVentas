@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DetalleVenta } from 'src/app/models/detalle-venta';
 import { VentaService  } from '../../services/venta.service';
 import { Producto } from 'src/app/models/producto';
+import { Venta } from 'src/app/models/venta';
 
 @Component({
   selector: 'app-venta',
@@ -40,8 +41,19 @@ export class VentaComponent implements OnInit {
   resetearProximoProducto(){
     this.cantidad = null;
     this.codigo = null;
-
   }
+
+  // CONFIRMACIÓN DE VENTA
+
+    finalizarVenta(){
+      if (confirm('Desea finalizar la venta?')){
+        const venta = new Venta(this.total, this.detallesVenta)
+        this.ventaService.postVenta(venta)
+        .subscribe(res => {
+        })
+        this.habilitarInicial();
+      }
+    }
 
   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
 
@@ -57,6 +69,8 @@ export class VentaComponent implements OnInit {
     this.venta = false
     this.detallesVenta = [];
     this.total = 0;
+    this.cantidad = null;
+    this.codigo = null
    }
 
 }
