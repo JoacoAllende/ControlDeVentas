@@ -13,6 +13,18 @@ productoCtrl.getProductos = (req, res) => {
     })
 };
 
+productoCtrl.getProducto = (req, res) => {
+    const codigo = req.params.codigo;
+    const query = 'SELECT * FROM producto WHERE codigo = ' + codigo;
+    mysqlConnection.query(query, (err, rows, fields) => {
+        if (!err) {
+            res.json(rows);
+        } else {
+            console.log(err);
+        }
+    })
+};
+
 productoCtrl.createProducto = (req, res) => {
     const producto = req.body;
     const query = 'INSERT INTO producto (codigo, descripcion, precio) VALUES ("' + producto.codigo + '","' + producto.descripcion

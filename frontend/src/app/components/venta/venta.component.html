@@ -1,0 +1,40 @@
+<div class="container">
+    <h1 class="text-center">VENTAS</h1>
+    <button type="submit" class="btn btn-default pull-right" (click)="iniciarVenta()" *ngIf="inicial">Iniciar venta</button>
+    <div *ngIf="venta">
+        <div class="col-md-6 form-group">
+            <input type="number" placeholder="Código" [(ngModel)]="codigo">
+        </div>
+        <div class="col-md-6 form-group">
+            <input type="number" placeholder="Cantidad" [(ngModel)]="cantidad">
+        </div>
+        <div class="pull-right">
+            <button type="submit" class="btn btn-default" (click)="addProducto(codigo, cantidad)">Agregar</button>
+            <button type="submit" class="btn btn-default" (click)="habilitarInicial()">Finalizar venta</button>
+        </div>
+    </div>
+    <div *ngIf="detallesVenta.length > 0">
+        <table class="table" id="productoTable">
+            <thead class="text-center">
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let detalle of detallesVenta">
+                    <td>{{detalle.codigo}}</td>
+                    <td>{{detalle.descripcion}}</td>
+                    <td>{{detalle.cantidad}}</td>
+                    <td>{{detalle.precio_detalle | number : '1.2-2'}}</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan=3>Total</td>
+                    <td>{{total | number : '1.2-2'}}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
