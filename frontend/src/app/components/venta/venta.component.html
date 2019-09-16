@@ -1,6 +1,24 @@
 <div class="container">
     <h1 class="text-center">VENTAS</h1>
     <button type="submit" class="btn btn-default pull-right" (click)="iniciarVenta()" *ngIf="inicial">Iniciar venta</button>
+    <button type="submit" class="btn btn-default pull-right" (click)="verVentas()" *ngIf="inicial">Ver ventas</button>
+    <div *ngIf="resumen">
+        <table class="table" id="productoTable" *ngIf="resumenVentas.length > 0">
+            <thead class="text-center">
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Detalle</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let venta of resumenVentas">
+                    <td>{{venta.cliente}}</td>
+                    <td>{{venta.total}}</td>
+                    <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-default" (click)="habilitarInicial()">Salir</button>
+    </div>
     <div *ngIf="venta">
         <div class="col-md-6 form-group">
             <input type="number" placeholder="Código" [(ngModel)]="codigo">
@@ -36,6 +54,6 @@
                 </tr>
             </tfoot>
         </table>
-        <button type="submit" class="btn btn-default pull-right" (click)="finalizarVenta(total)">Finalizar venta</button>
+        <button type="submit" class="btn btn-default pull-right" (click)="finalizarVenta(total)" *ngIf="venta">Finalizar venta</button>
     </div>
 </div>

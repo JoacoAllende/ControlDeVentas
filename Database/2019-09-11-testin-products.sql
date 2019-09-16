@@ -20,3 +20,5 @@ INSERT INTO producto (codigo, descripcion, precio) VALUES
 ('7333222444398','Mostaza Heinz 566 gr.', 314.99),
 ('7333222444383','Mostaza Heinz 396 gr.', 219.99),
 ('7333222444331','Mostaza Heinz 200 gr.', 75.8);
+
+INSERT INTO cliente (nombre) VALUES ('Consumidor final');
