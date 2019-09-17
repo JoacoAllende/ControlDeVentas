@@ -1,7 +1,7 @@
 <div class="container">
     <h1 class="text-center">VENTAS</h1>
-    <button type="submit" class="btn btn-default pull-right" (click)="iniciarVenta()" *ngIf="inicial">Iniciar venta</button>
-    <button type="submit" class="btn btn-default pull-right" (click)="verVentas()" *ngIf="inicial">Ver ventas</button>
+    <button class="btn btn-default pull-right" (click)="iniciarVenta()" *ngIf="inicial">Iniciar venta</button>
+    <button class="btn btn-default pull-right" (click)="verVentas()" *ngIf="inicial">Ver ventas</button>
     <div *ngIf="resumen">
         <table class="table" id="productoTable" *ngIf="resumenVentas.length > 0">
             <thead class="text-center">
@@ -17,18 +17,18 @@
                 </tr>
             </tbody>
         </table>
-        <button type="submit" class="btn btn-default" (click)="habilitarInicial()">Salir</button>
+        <button class="btn btn-default" (click)="habilitarInicial()">Salir</button>
     </div>
     <div *ngIf="venta">
         <div class="col-md-6 form-group">
-            <input type="number" placeholder="Código" [(ngModel)]="codigo">
+            <input (keydown)="onKeydown($event)" type="number" placeholder="Código" [(ngModel)]="codigo" id="codigoProducto">
         </div>
         <div class="col-md-6 form-group">
-            <input type="number" placeholder="Cantidad" [(ngModel)]="cantidad">
+            <input (keydown)="onKeydown($event)" type="number" placeholder="Cantidad" [(ngModel)]="cantidad">
         </div>
         <div class="pull-right">
             <button type="submit" class="btn btn-default" (click)="addProducto(codigo, cantidad)">Agregar</button>
-            <button type="submit" class="btn btn-default" (click)="habilitarInicial()">Cancelar venta</button>
+            <button class="btn btn-default" (click)="habilitarInicial()">Cancelar venta</button>
         </div>
     </div>
     <div *ngIf="detallesVenta.length > 0">
@@ -45,6 +45,9 @@
                     <td>{{detalle.descripcion}}</td>
                     <td>{{detalle.cantidad}}</td>
                     <td>{{detalle.precio_detalle | number : '1.2-2'}}</td>
+                    <td><a (click)="deleteDetalle(detalle)">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </a></td>
                 </tr>
             </tbody>
             <tfoot>

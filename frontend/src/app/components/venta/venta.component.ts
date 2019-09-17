@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { DetalleVenta } from 'src/app/models/detalle-venta';
 import { VentaService  } from '../../services/venta.service';
 import { Producto } from 'src/app/models/producto';
@@ -42,14 +42,36 @@ export class VentaComponent implements OnInit {
   // GENERACIÓN DE VENTA EN MEMORIA
 
   addProducto(codigo:number, cantidad:number){
+    if (cantidad == null)
+      cantidad = 1;
     this.ventaService.getProducto(codigo)
       .subscribe(res => {
-        this.ventaService.selectedProducto = res as Producto;
-        const producto = this.ventaService.selectedProducto[0];
-        this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
-        this.total += producto.precio * cantidad;
+        if (res.length > 0) {
+          this.ventaService.selectedProducto = res as Producto;
+          const producto = this.ventaService.selectedProducto[0];
+          const detalle = this.detallesVenta.filter(det => (det.codigo == producto.codigo));
+          if (detalle.length == 0)
+            this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
+          else {
+            this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != producto.codigo));
+            cantidad += detalle[0].cantidad;
+            this.total -= detalle[0].precio_detalle;
+            this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
+          }
+          this.total += producto.precio * cantidad;
+        } else {
+          alert('No existe el código ingresado');
+        }
         this.resetearProximoProducto();
+        document.getElementById("codigoProducto").focus();
       })
+  }
+
+  deleteDetalle(detalle){
+    if (confirm('Desea quitar el producto de la venta?')){
+      this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != detalle.codigo));
+      this.total -= detalle.precio_detalle;
+    }
   }
 
   resetearProximoProducto(){
@@ -85,6 +107,7 @@ export class VentaComponent implements OnInit {
     }
 
     getDetalles(id_venta){
+      this.total = 0;
       this.ventaService.getDetalles(id_venta)
       .subscribe(res =>{
         this.id_venta = id_venta;
@@ -114,5 +137,11 @@ export class VentaComponent implements OnInit {
     this.cantidad = null;
     this.codigo = null
    }
+
+   onKeydown(event) {
+    if (event.key === "Enter") {
+      this.addProducto(this.codigo,this.cantidad);
+    }
+  }
 
 }
