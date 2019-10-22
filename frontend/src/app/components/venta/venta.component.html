@@ -45,7 +45,7 @@
                     <td>{{detalle.descripcion}}</td>
                     <td>{{detalle.cantidad}}</td>
                     <td>{{detalle.precio_detalle | number : '1.2-2'}}</td>
-                    <td><a (click)="deleteDetalle(detalle)">
+                    <td *ngIf="venta"><a (click)="deleteDetalle(detalle)">
                         <i class="glyphicon glyphicon-remove"></i>
                     </a></td>
                 </tr>

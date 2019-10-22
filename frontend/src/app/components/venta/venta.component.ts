@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ɵConsole } from '@angular/core';
 import { DetalleVenta } from 'src/app/models/detalle-venta';
-import { VentaService  } from '../../services/venta.service';
+import { VentaService } from '../../services/venta.service';
 import { Producto } from 'src/app/models/producto';
 import { Venta } from 'src/app/models/venta';
 import { Observable } from 'rxjs';
@@ -22,12 +22,12 @@ export class VentaComponent implements OnInit {
   public resumenVentas: Venta[] = [];
   public resumenVentasObservable: Observable<Venta[]>;
   public detallesVentaObservable: Observable<DetalleVenta[]>;
-  codigo : number;
-  cantidad : number;
-  total : number = 0;
+  codigo: number;
+  cantidad: number;
+  total: number = 0;
   id_venta;
 
-  constructor(private ventaService : VentaService) { }
+  constructor(private ventaService: VentaService) { }
 
   ngOnInit() {
     const hoy = new Date();
@@ -41,12 +41,12 @@ export class VentaComponent implements OnInit {
 
   // GENERACIÓN DE VENTA EN MEMORIA
 
-  addProducto(codigo:number, cantidad:number){
+  addProducto(codigo: number, cantidad: number) {
     if (cantidad == null)
       cantidad = 1;
     this.ventaService.getProducto(codigo)
       .subscribe(res => {
-        if (res.length > 0) {
+        if ((<any>res).length > 0) {
           this.ventaService.selectedProducto = res as Producto;
           const producto = this.ventaService.selectedProducto[0];
           const detalle = this.detallesVenta.filter(det => (det.codigo == producto.codigo));
@@ -63,64 +63,71 @@ export class VentaComponent implements OnInit {
           alert('No existe el código ingresado');
         }
         this.resetearProximoProducto();
-        document.getElementById("codigoProducto").focus();
+        window.setTimeout(function ()
+        {
+          document.getElementById("codigoProducto").focus();
+        }, 0);
       })
   }
 
-  deleteDetalle(detalle){
-    if (confirm('Desea quitar el producto de la venta?')){
+  deleteDetalle(detalle) {
+    if (confirm('Desea quitar el producto de la venta?')) {
       this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != detalle.codigo));
       this.total -= detalle.precio_detalle;
     }
   }
 
-  resetearProximoProducto(){
+  resetearProximoProducto() {
     this.cantidad = null;
     this.codigo = null;
   }
 
   // CONFIRMACIÓN DE VENTA
 
-    finalizarVenta(){
-      if (confirm('Desea finalizar la venta?')){
-        const venta = new Venta(this.total, this.detallesVenta)
-        this.ventaService.postVenta(venta)
+  finalizarVenta() {
+    if (confirm('Desea finalizar la venta?')) {
+      const venta = new Venta(this.total, this.detallesVenta)
+      this.ventaService.postVenta(venta)
         .subscribe(res => {
         })
-        this.habilitarInicial();
-      }
+      this.habilitarInicial();
     }
+  }
 
-    // VENTAS
+  // VENTAS
 
-    verVentas(){
-      this.venta = false;
-      this.inicial = false;
-      this.resumen = true;
-      const hoy = new Date();
-      const mes = hoy.getMonth() + 1;
-      const fecha = hoy.getFullYear() + '-' + mes + '-' + hoy.getDate();
-      this.ventaService.getVenta(fecha)
+  verVentas() {
+    this.venta = false;
+    this.inicial = false;
+    this.resumen = true;
+    const hoy = new Date();
+    const mes = hoy.getMonth() + 1;
+    const fecha = hoy.getFullYear() + '-' + mes + '-' + hoy.getDate();
+    this.ventaService.getVenta(fecha)
       .subscribe(res => {
         this.resumenVentasObservable.subscribe(vent => this.resumenVentas = vent);
       })
-    }
+  }
 
-    getDetalles(id_venta){
-      this.total = 0;
-      this.ventaService.getDetalles(id_venta)
-      .subscribe(res =>{
+  getDetalles(id_venta) {
+    this.total = 0;
+    this.ventaService.getDetalles(id_venta)
+      .subscribe(res => {
         this.id_venta = id_venta;
         this.detallesVenta = res as DetalleVenta[];
         this.detallesVenta.forEach(detalle => {
           this.total += detalle.precio_detalle;
         });
       })
-    }
+  }
 
   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
 
-  iniciarVenta(){
+  iniciarVenta() {
+    window.setTimeout(function ()
+        {
+          document.getElementById("codigoProducto").focus();
+        }, 0);
     this.venta = true;
     this.inicial = false;
     this.resumen = false;
@@ -128,7 +135,7 @@ export class VentaComponent implements OnInit {
     this.total = 0;
   }
 
-  habilitarInicial(){
+  habilitarInicial() {
     this.inicial = true;
     this.venta = false
     this.resumen = false;
@@ -136,11 +143,11 @@ export class VentaComponent implements OnInit {
     this.total = 0;
     this.cantidad = null;
     this.codigo = null
-   }
+  }
 
-   onKeydown(event) {
+  onKeydown(event) {
     if (event.key === "Enter") {
-      this.addProducto(this.codigo,this.cantidad);
+      this.addProducto(this.codigo, this.cantidad);
     }
   }
 
