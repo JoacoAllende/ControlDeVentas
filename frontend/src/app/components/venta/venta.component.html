@@ -12,7 +12,7 @@
             <tbody>
                 <tr *ngFor="let venta of resumenVentas">
                     <td>{{venta.cliente}}</td>
-                    <td>{{venta.total}}</td>
+                    <td>{{venta.total | number : '1.2-2'}}</td>
                     <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
                 </tr>
             </tbody>

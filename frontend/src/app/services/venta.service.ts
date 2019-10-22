@@ -20,7 +20,7 @@ export class VentaService {
   }
 
   getProducto(codigo : number){
-    return this.http.get(`http://localhost:3000/productos` + codigo);
+    return this.http.get(`http://localhost:3000/productos/` + codigo);
   }
 
   postVenta(venta : Venta){
@@ -28,10 +28,10 @@ export class VentaService {
   }
 
   getVenta(fecha : string){
-    return this.http.get<Venta[]>(`http://localhost:3000/ventas` + fecha);
+    return this.http.get<Venta[]>(`http://localhost:3000/ventas/` + fecha);
   }
 
   getDetalles(id_venta : number){
-    return this.http.get<DetalleVenta[]>(`http://localhost:3000/detalles` + id_venta);
+    return this.http.get<DetalleVenta[]>(`http://localhost:3000/detalles/` + id_venta);
   }
 }

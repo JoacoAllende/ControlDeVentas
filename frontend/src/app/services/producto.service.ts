@@ -24,12 +24,11 @@ export class ProductoService {
    }
 
    getProductos(){
-    return this.http.get<Producto[]>(`http://localhost:3000/productos`)
-    .pipe()
+    return this.http.get<Producto[]>(`http://localhost:3000/productos`);
    }
 
    deleteProducto(id: number){
-     return this.http.delete(`http://localhost:3000/productos` + id);
+     return this.http.delete(`http://localhost:3000/productos/` + id);
    }
 
 }
