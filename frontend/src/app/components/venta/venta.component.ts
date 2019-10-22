@@ -44,30 +44,41 @@ export class VentaComponent implements OnInit {
   addProducto(codigo: number, cantidad: number) {
     if (cantidad == null)
       cantidad = 1;
-    this.ventaService.getProducto(codigo)
-      .subscribe(res => {
-        if ((<any>res).length > 0) {
-          this.ventaService.selectedProducto = res as Producto;
-          const producto = this.ventaService.selectedProducto[0];
-          const detalle = this.detallesVenta.filter(det => (det.codigo == producto.codigo));
-          if (detalle.length == 0)
-            this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
-          else {
-            this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != producto.codigo));
-            cantidad += detalle[0].cantidad;
-            this.total -= detalle[0].precio_detalle;
-            this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
-          }
-          this.total += producto.precio * cantidad;
-        } else {
-          alert('No existe el código ingresado');
-        }
-        this.resetearProximoProducto();
-        window.setTimeout(function ()
-        {
-          document.getElementById("codigoProducto").focus();
-        }, 0);
-      })
+    if (codigo == null) {
+      alert('Debe ingresarse un código');
+    } else if (codigo.toString().length != 12) {
+      alert('La longitud del código debe ser de 12')
+    } else {
+      if (cantidad <= 0) {
+        alert('La cantidad del producto debe ser mayor a 0');
+      } else if (!Number.isInteger(cantidad)) {
+        alert('La cantidad del producto debe ser un número entero');
+      } else {
+        this.ventaService.getProducto(codigo)
+          .subscribe(res => {
+            if ((<any>res).length > 0) {
+              this.ventaService.selectedProducto = res as Producto;
+              const producto = this.ventaService.selectedProducto[0];
+              const detalle = this.detallesVenta.filter(det => (det.codigo == producto.codigo));
+              if (detalle.length == 0)
+                this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
+              else {
+                this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != producto.codigo));
+                cantidad += detalle[0].cantidad;
+                this.total -= detalle[0].precio_detalle;
+                this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
+              }
+              this.total += producto.precio * cantidad;
+            } else {
+              alert('No existe el código ingresado');
+            }
+          })
+      }
+    }
+    this.resetearProximoProducto();
+    window.setTimeout(function () {
+      document.getElementById("codigoProducto").focus();
+    }, 0);
   }
 
   deleteDetalle(detalle) {
@@ -124,10 +135,9 @@ export class VentaComponent implements OnInit {
   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
 
   iniciarVenta() {
-    window.setTimeout(function ()
-        {
-          document.getElementById("codigoProducto").focus();
-        }, 0);
+    window.setTimeout(function () {
+      document.getElementById("codigoProducto").focus();
+    }, 0);
     this.venta = true;
     this.inicial = false;
     this.resumen = false;

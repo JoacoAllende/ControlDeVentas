@@ -21,10 +21,10 @@
     </div>
     <div *ngIf="venta">
         <div class="col-md-6 form-group">
-            <input (keydown)="onKeydown($event)" type="number" placeholder="Código" [(ngModel)]="codigo" id="codigoProducto">
+            <input (keydown)="onKeydown($event)" type="number" placeholder="Código" [(ngModel)]="codigo" id="codigoProducto" minlength="12" maxlength="12">
         </div>
         <div class="col-md-6 form-group">
-            <input (keydown)="onKeydown($event)" type="number" placeholder="Cantidad" [(ngModel)]="cantidad">
+            <input (keydown)="onKeydown($event)" type="number" placeholder="Cantidad"  min="1" [(ngModel)]="cantidad">
         </div>
         <div class="pull-right">
             <button type="submit" class="btn btn-default" (click)="addProducto(codigo, cantidad)">Agregar</button>

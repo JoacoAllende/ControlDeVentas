@@ -39,7 +39,7 @@
         <div class="form-group">
             <label for="Codigo">Código</label>
             <input type="text" class="form-control" name="codigo" [(ngModel)]="productoService.selectedProducto.codigo" #codigo="ngModel" 
-                placeholder="Codigo" required="required">
+                placeholder="Codigo" required="required" maxlength="12">
         </div>
         <div class="form-group">
             <label for="Descripcion">Descripción</label>
