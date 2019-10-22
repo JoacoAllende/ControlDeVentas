@@ -5,6 +5,7 @@ const mysqlConnection = require('../database');
 ventaCtrl.createVenta = (req, res) => {
     const venta = req.body;
     const query = 'INSERT INTO venta (id_cliente, fecha, total) VALUES (1, CURDATE(), ' + venta.total + ');';
+    console.log(query);
     mysqlConnection.query(query, (err) => {
         if (!err) {
             const query_id_venta = 'SELECT last_insert_id() AS id_venta';
