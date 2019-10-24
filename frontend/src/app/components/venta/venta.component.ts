@@ -26,6 +26,10 @@ export class VentaComponent implements OnInit {
   cantidad: number;
   total: number = 0;
   id_venta;
+  fecha;
+  //PAGINACIÓN
+  actualPageVentas: number = 1;
+  actualPageDetalles: number = 1;
 
   constructor(private ventaService: VentaService) { }
 
@@ -33,8 +37,8 @@ export class VentaComponent implements OnInit {
     const hoy = new Date();
     const mes = hoy.getMonth() + 1;
     const fecha = hoy.getFullYear() + '-' + mes + '-' + hoy.getDate();
-    this.resumenVentasObservable = this.ventaService.getVenta(fecha);
-    this.resumenVentasObservable.subscribe(vent => this.resumenVentas = vent);
+    this.fecha = fecha;
+    this.cambiarFecha(fecha);
     this.detallesVentaObservable = this.ventaService.getDetalles(this.id_venta);
     this.detallesVentaObservable.subscribe(det => this.detallesVenta = det);
   }
@@ -83,8 +87,8 @@ export class VentaComponent implements OnInit {
 
   deleteDetalle(detalle) {
     if (confirm('Desea quitar el producto de la venta?')) {
-      this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != detalle.codigo));
       this.total -= detalle.precio_detalle;
+      this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != detalle.codigo));
     }
   }
 
@@ -120,6 +124,11 @@ export class VentaComponent implements OnInit {
       })
   }
 
+  cambiarFecha(fecha: string) {
+    this.resumenVentasObservable = this.ventaService.getVenta(fecha);
+    this.resumenVentasObservable.subscribe(vent => this.resumenVentas = vent);
+  }
+
   getDetalles(id_venta) {
     this.total = 0;
     this.ventaService.getDetalles(id_venta)
@@ -130,6 +139,10 @@ export class VentaComponent implements OnInit {
           this.total += detalle.precio_detalle;
         });
       })
+  }
+
+  cancelar() {
+    this.detallesVenta = [];
   }
 
   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
