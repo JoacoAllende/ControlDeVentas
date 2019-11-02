@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/JoacoAllende/ControlDeVentas#readme",
   "dependencies": {
+    "@afipsdk/afip.js": "^0.6.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "morgan": "^1.9.1",
