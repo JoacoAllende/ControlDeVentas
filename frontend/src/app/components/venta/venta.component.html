@@ -10,13 +10,14 @@
             <thead class="text-center">
                 <th>Cliente</th>
                 <th>Total</th>
-                <th>Detalle</th>
+                <th>Detalles</th>
             </thead>
             <tbody>
                 <tr *ngFor="let venta of resumenVentas | paginate: { itemsPerPage: 8, currentPage: actualPageVentas }">
                     <td>{{venta.cliente}}</td>
                     <td>{{venta.total | number : '1.2-2'}}</td>
                     <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
+                    <td (click)="comenzarFactura(venta.id, venta.total)" class="glyphicon glyphicon-folder-close"></td>
                 </tr>
             </tbody>
         </table>
@@ -67,5 +68,34 @@
         <button type="submit" class="btn btn-default pull-right" (click)="finalizarVenta(total)" *ngIf="venta">Finalizar
             venta</button>
         <button type="submit" class="btn btn-default" (click)="cancelar()">Cancelar detalles</button>
+    </div>
+    <div *ngIf="factura">
+        <form role="form" #facturaForm="ngForm" name='facturaForm' standalone>
+            <label for="tipoFactura">Tipo de factura</label>
+            <div class="select">
+                <select [(ngModel)]="cbteTipoSelected" name="cbteTipoSelected" required>
+                    <option *ngFor="let cbteTipo of cbteTipos" [value]="cbteTipo.value">{{cbteTipo.name}}</option>
+                </select>
+            </div>
+            <label for="tipoDocumento">Tipo de documento</label>
+            <div class="select">
+                <select [(ngModel)]="docTipoSelected" name="docTipoSelected" required>
+                    <option *ngFor="let docTipo of docTipos" [value]="docTipo.value">{{docTipo.name}}</option>
+                </select>
+            </div>
+            <label for="tipoDocumento">Nro. de documento</label>
+            <div>
+                <input type="number" name="dniNro" placeholder="Nro Documento" [(ngModel)]="dniNro" required>
+            </div>
+            <label for="tipoDocumento">Importe Neto</label>
+            <div>
+                <input type="number" name="impNeto" placeholder="Imp. Neto" readonly [(ngModel)]="total">
+            </div>
+            <label for="tipoDocumento">Importe Total</label>
+            <div>
+                <input type="number" name="impTotal" placeholder="Imp. Total" readonly [(ngModel)]="total">
+            </div>
+            <button class="btn btn-default" (click)="facturar(facturaForm)">Facturar</button>
+        </form>
     </div>
 </div>

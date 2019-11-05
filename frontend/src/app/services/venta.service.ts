@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Producto } from '../models/producto';
 import { Venta } from '../models/venta';
 import { DetalleVenta } from '../models/detalle-venta';
+import { Factura } from '../models/factura';
 
 @Injectable({
   providedIn: 'root'
@@ -33,5 +34,9 @@ export class VentaService {
 
   getDetalles(id_venta : number){
     return this.http.get<DetalleVenta[]>(`http://localhost:3000/detalles/` + id_venta);
+  }
+
+  postFactura(factura : Factura){
+    return this.http.post(`http://localhost:3000/facturacion/`, factura);
   }
 }

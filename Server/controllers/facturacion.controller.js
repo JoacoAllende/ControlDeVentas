@@ -3,11 +3,12 @@ const Afip = require('@afipsdk/afip.js');
 
 facturaCtrl.createFactura = async (req, res) => {
     const afip = new Afip({ CUIT: 20379855068 });
-    const docTipo = req.params.docTipo;
-    const docNro = req.params.docNro;
-    const cbteTipo = req.params.cbteTipo;
-    const impTotal = req.params.impTotal;
-    const impNeto = req.params.impNeto;
+    const factura = req.body;
+    const docTipo = factura.docTipo;
+    const docNro = factura.docNro;
+    const cbteTipo = factura.cbteTipo;
+    const impTotal = factura.impTotal;
+    const impNeto = factura.impNeto;
     const fecha = new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     let data = {
         'CantReg': 1,  // Cantidad de comprobantes a registrar
