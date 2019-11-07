@@ -5,8 +5,9 @@ import { Producto } from 'src/app/models/producto';
 import { Venta } from 'src/app/models/venta';
 import { Observable } from 'rxjs';
 import * as jsPDF from 'jspdf';
-import { Factura } from 'src/app/models/factura';
+import { FacturaAfip } from 'src/app/models/facturaAfip';
 import { NgForm } from '@angular/forms';
+import { FacturaLocal } from 'src/app/models/facturaLocal';
 
 @Component({
   selector: 'app-venta',
@@ -40,7 +41,8 @@ export class VentaComponent implements OnInit {
     { name: 'CUIL', value: 86 },
     { name: 'DNI', value: 99 }
   ];
-  docTipoSelected = 80;
+  docTipoSelected;
+  docNroSelected;
   cbteTipos: any = [
     { name: 'Factura B', value: 6 },
     { name: 'Factura C', value: 11 }
@@ -163,90 +165,36 @@ export class VentaComponent implements OnInit {
 
   // FACTURACIÓN
 
-  comenzarFactura(id_venta, total) {
-    this.total = total;
-    this.factura = true;
+  comenzarFactura(id_venta, total, docTipo, docNro, facturado) {
+    if (!facturado) {
+      this.total = total;
+      this.id_venta = id_venta;
+      this.docTipoSelected = docTipo;
+      this.docNroSelected = docNro;
+      this.factura = true;
+      this.detallesVenta = [];
+    } else {
+      alert('La venta ya ha sido facturada');
+    }
   }
 
   facturar(form: NgForm) {
     if (confirm('Desea realizar la factura?')) {
-      const factura = new Factura(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal);
-      this.ventaService.postFactura(factura)
+      const facturaAfip = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal);
+      this.ventaService.postFacturaAfip(facturaAfip)
         .subscribe(res => {
-          const doc = new jsPDF();
-          //ORIGINAL
-          doc.rect(10, 6, doc.internal.pageSize.width - 20, 10, 'S');
-          doc.text('ORIGINAL', doc.internal.pageSize.width / 2, 13.2, 'center');
-          //PRIMER RECTÁNGULO
-          doc.rect(10, 16, doc.internal.pageSize.width - 20, 60, 'S');
-          doc.line(doc.internal.pageSize.width / 2, 30, doc.internal.pageSize.width / 2, 76);
-          //CUADRO TIPO FACTURA
-          doc.rect(doc.internal.pageSize.width / 2 - 7, 16, 14, 14, 'S');
-          doc.setFontSize(24);
-          doc.text('C', doc.internal.pageSize.width / 2, 24, 'center');
-          doc.setFontSize(8);
-          doc.text('COD. 011', doc.internal.pageSize.width / 2, 28, 'center');
-          //PRIMER SUBRECTANGULO
-          doc.setFontSize(20);
-          doc.text('ALLENDE JOAQUIN', ((doc.internal.pageSize.width / 2)) / 2, 25, 'center');
-          doc.setFontSize(12);
-          doc.text('Razón Social: Allende Joaquín', 15, 35, 'left');
-          doc.text('Domicilio comercial: Av. Buzón 452 Piso: PB \n Depto. 3 - Tandil, Buenos Aires', 15, 45, 'left');
-          doc.text('Condición frente al IVA: Responsable \n Monotributo', 15, 60, 'left');
-          //SEGUNDO SUBRECTANGULO
-          doc.setFontSize(20);
-          doc.text('FACTURA', (doc.internal.pageSize.width / 2) + 10, 25, 'left');
-          doc.setFontSize(11);
-          doc.text('Punto de Venta: 00001    Comp. Nro: 000000011',(doc.internal.pageSize.width / 2) + 5, 35, 'left');
-          doc.text('Fecha de Emisión:  22/10/2019',(doc.internal.pageSize.width / 2) + 5, 42, 'left');
-          doc.text('CUIT:  20379855068',(doc.internal.pageSize.width / 2) + 5, 52, 'left');
-          doc.text('Ingresos Brutos:  2037985506',(doc.internal.pageSize.width / 2) + 5, 59, 'left');
-          doc.text('Fecha de Inicio de Actividades:  01/12/2018',(doc.internal.pageSize.width / 2) + 5, 66, 'left');
-          //SEGUNDO RECTANGULO
-          doc.rect(10, 78, doc.internal.pageSize.width - 20, 22, 'S');
-          doc.text('CUIT: 30645694607', 15, 85, 'left');
-          doc.text('Condición frente al IVA:  Iva Sujeto Exento', 15, 95, 'left');
-          doc.text('Razón Social: APPIDA', (doc.internal.pageSize.width / 2) + 5, 85, 'left');
-          doc.text('Domicilio: España 1473 - Ayacucho, Buenos Aires', (doc.internal.pageSize.width / 2) + 5, 95, 'left');
-          //TITULOS DETALLES
-          doc.setFontSize(9);
-          doc.setDrawColor(0);
-          doc.setFillColor(169,169,169);
-          doc.rect(10, 102, doc.internal.pageSize.width - 20, 10, 'FD');
-          doc.text('Código', 20, 107, 'left');
-          doc.text('Descripción', 40, 107, 'left');
-          doc.text('Cantidad', 85, 107, 'left');
-          doc.text('U. medida', 105, 107, 'left');
-          doc.text('Precio Unit.', 125, 107, 'left');
-          doc.text('% Bonif.', 145, 107, 'left');
-          doc.text('Imp. Bonif.', 165, 107, 'left');
-          doc.text('Subtotal', 185, 107, 'left');
-          //DETALLES
-          doc.setFontSize(8);
-          doc.text('Desarrollo de sistemas de \nadministración e información \ngeneral para rectorado', 40, 119, 'left');
-          doc.text('1.00', 100, 119, 'right');
-          doc.text('unidades', 115, 119, 'center');
-          doc.text(factura.impTotal.toString(), 140, 119, 'right');
-          doc.text('0.00', 160, 119, 'right');
-          doc.text('0.00', 180, 119, 'right');
-          doc.text(factura.impTotal.toString(), 198, 119, 'right');
-          //RECTANGULO FINAL
-          doc.setFontSize(10);
-          doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
-          doc.text('Subtotal: $', 165, 230, 'right');
-          doc.text(factura.impTotal.toString(), 198, 230, 'right');
-          doc.text('Imp. Otros Tributos: $', 165, 240, 'right');
-          doc.text('  0.00', 198, 240, 'right');
-          doc.text('Importe Total: $', 165, 250, 'right');
-          doc.text(factura.impTotal.toString(), 198, 250, 'right');
-          //CAE Y FEC. VENC.
-          doc.setFontSize(11);
-          doc.text('CAE N°: ', 166, 266, 'right');
-          doc.text(res['CAE'], 168, 266, 'left');
-          doc.text('Fecha de Vto. de CAE: ', 166, 273, 'right');
-          doc.text(res['CAEFchVto'], 168, 273, 'left');
-          //PDF
-          doc.save('Test.pdf');
+          const today = new Date();
+          const fecha = today.getFullYear() + '-' + today.getMonth() + '-' + today.getDate();
+          const facturaLocal = new FacturaLocal(this.id_venta, res['CAE'], fecha, form.value.cbteTipoSelected, 1, res['voucherNumber'], 1);
+          this.ventaService.postFacturaLocal(facturaLocal)
+          .subscribe(res => {
+            this.ventaService.putVenta(this.id_venta)
+            .subscribe(res => {
+              
+            })
+          })
+          // this.facturaPdf();
+          
         })
       this.habilitarInicial();
     }
@@ -281,5 +229,82 @@ export class VentaComponent implements OnInit {
       this.addProducto(this.codigo, this.cantidad);
     }
   }
+
+  // facturaPdf() {
+  //   const doc = new jsPDF();
+  //   //ORIGINAL
+  //   doc.rect(10, 6, doc.internal.pageSize.width - 20, 10, 'S');
+  //   doc.text('ORIGINAL', doc.internal.pageSize.width / 2, 13.2, 'center');
+  //   //PRIMER RECTÁNGULO
+  //   doc.rect(10, 16, doc.internal.pageSize.width - 20, 60, 'S');
+  //   doc.line(doc.internal.pageSize.width / 2, 30, doc.internal.pageSize.width / 2, 76);
+  //   //CUADRO TIPO FACTURA
+  //   doc.rect(doc.internal.pageSize.width / 2 - 7, 16, 14, 14, 'S');
+  //   doc.setFontSize(24);
+  //   doc.text('C', doc.internal.pageSize.width / 2, 24, 'center');
+  //   doc.setFontSize(8);
+  //   doc.text('COD. 011', doc.internal.pageSize.width / 2, 28, 'center');
+  //   //PRIMER SUBRECTANGULO
+  //   doc.setFontSize(20);
+  //   doc.text('ALLENDE JOAQUIN', ((doc.internal.pageSize.width / 2)) / 2, 25, 'center');
+  //   doc.setFontSize(12);
+  //   doc.text('Razón Social: Allende Joaquín', 15, 35, 'left');
+  //   doc.text('Domicilio comercial: Av. Buzón 452 Piso: PB \n Depto. 3 - Tandil, Buenos Aires', 15, 45, 'left');
+  //   doc.text('Condición frente al IVA: Responsable \n Monotributo', 15, 60, 'left');
+  //   //SEGUNDO SUBRECTANGULO
+  //   doc.setFontSize(20);
+  //   doc.text('FACTURA', (doc.internal.pageSize.width / 2) + 10, 25, 'left');
+  //   doc.setFontSize(11);
+  //   doc.text('Punto de Venta: 00001    Comp. Nro: 000000011',(doc.internal.pageSize.width / 2) + 5, 35, 'left');
+  //   doc.text('Fecha de Emisión:  22/10/2019',(doc.internal.pageSize.width / 2) + 5, 42, 'left');
+  //   doc.text('CUIT:  20379855068',(doc.internal.pageSize.width / 2) + 5, 52, 'left');
+  //   doc.text('Ingresos Brutos:  2037985506',(doc.internal.pageSize.width / 2) + 5, 59, 'left');
+  //   doc.text('Fecha de Inicio de Actividades:  01/12/2018',(doc.internal.pageSize.width / 2) + 5, 66, 'left');
+  //   //SEGUNDO RECTANGULO
+  //   doc.rect(10, 78, doc.internal.pageSize.width - 20, 22, 'S');
+  //   doc.text('CUIT: 30645694607', 15, 85, 'left');
+  //   doc.text('Condición frente al IVA:  Iva Sujeto Exento', 15, 95, 'left');
+  //   doc.text('Razón Social: APPIDA', (doc.internal.pageSize.width / 2) + 5, 85, 'left');
+  //   doc.text('Domicilio: España 1473 - Ayacucho, Buenos Aires', (doc.internal.pageSize.width / 2) + 5, 95, 'left');
+  //   //TITULOS DETALLES
+  //   doc.setFontSize(9);
+  //   doc.setDrawColor(0);
+  //   doc.setFillColor(169,169,169);
+  //   doc.rect(10, 102, doc.internal.pageSize.width - 20, 10, 'FD');
+  //   doc.text('Código', 20, 107, 'left');
+  //   doc.text('Descripción', 40, 107, 'left');
+  //   doc.text('Cantidad', 85, 107, 'left');
+  //   doc.text('U. medida', 105, 107, 'left');
+  //   doc.text('Precio Unit.', 125, 107, 'left');
+  //   doc.text('% Bonif.', 145, 107, 'left');
+  //   doc.text('Imp. Bonif.', 165, 107, 'left');
+  //   doc.text('Subtotal', 185, 107, 'left');
+  //   //DETALLES
+  //   doc.setFontSize(8);
+  //   doc.text('Desarrollo de sistemas de \nadministración e información \ngeneral para rectorado', 40, 119, 'left');
+  //   doc.text('1.00', 100, 119, 'right');
+  //   doc.text('unidades', 115, 119, 'center');
+  //   doc.text(factura.impTotal.toString(), 140, 119, 'right');
+  //   doc.text('0.00', 160, 119, 'right');
+  //   doc.text('0.00', 180, 119, 'right');
+  //   doc.text(factura.impTotal.toString(), 198, 119, 'right');
+  //   //RECTANGULO FINAL
+  //   doc.setFontSize(10);
+  //   doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
+  //   doc.text('Subtotal: $', 165, 230, 'right');
+  //   doc.text(factura.impTotal.toString(), 198, 230, 'right');
+  //   doc.text('Imp. Otros Tributos: $', 165, 240, 'right');
+  //   doc.text('  0.00', 198, 240, 'right');
+  //   doc.text('Importe Total: $', 165, 250, 'right');
+  //   doc.text(factura.impTotal.toString(), 198, 250, 'right');
+  //   //CAE Y FEC. VENC.
+  //   doc.setFontSize(11);
+  //   doc.text('CAE N°: ', 166, 266, 'right');
+  //   doc.text(res['CAE'], 168, 266, 'left');
+  //   doc.text('Fecha de Vto. de CAE: ', 166, 273, 'right');
+  //   doc.text(res['CAEFchVto'], 168, 273, 'left');
+  //   //PDF
+  //   doc.save('Test.pdf');
+  // }
 
 }

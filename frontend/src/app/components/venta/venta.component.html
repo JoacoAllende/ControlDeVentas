@@ -17,7 +17,7 @@
                     <td>{{venta.cliente}}</td>
                     <td>{{venta.total | number : '1.2-2'}}</td>
                     <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
-                    <td (click)="comenzarFactura(venta.id, venta.total)" class="glyphicon glyphicon-folder-close"></td>
+                    <td (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado)" class="glyphicon glyphicon-folder-close"></td>
                 </tr>
             </tbody>
         </table>
@@ -79,13 +79,13 @@
             </div>
             <label for="tipoDocumento">Tipo de documento</label>
             <div class="select">
-                <select [(ngModel)]="docTipoSelected" name="docTipoSelected" required>
+                <select [(ngModel)]="docTipoSelected" name="docTipoSelected" required aria-readonly="true">
                     <option *ngFor="let docTipo of docTipos" [value]="docTipo.value">{{docTipo.name}}</option>
                 </select>
             </div>
             <label for="tipoDocumento">Nro. de documento</label>
             <div>
-                <input type="number" name="dniNro" placeholder="Nro Documento" [(ngModel)]="dniNro" required>
+                <input type="number" name="dniNro" placeholder="Nro Documento" readonly [(ngModel)]="docNroSelected" required>
             </div>
             <label for="tipoDocumento">Importe Neto</label>
             <div>

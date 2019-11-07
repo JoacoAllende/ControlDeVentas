@@ -1,4 +1,4 @@
-export class Factura {
+export class FacturaAfip {
 
     constructor(cbteTipo, docTipo, docNro, impTotal, impNeto){
         this.cbteTipo = cbteTipo;

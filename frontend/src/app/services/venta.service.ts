@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Producto } from '../models/producto';
 import { Venta } from '../models/venta';
 import { DetalleVenta } from '../models/detalle-venta';
-import { Factura } from '../models/factura';
+import { FacturaAfip } from '../models/facturaAfip';
+import { FacturaLocal } from '../models/facturaLocal';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,15 @@ export class VentaService {
     return this.http.get<DetalleVenta[]>(`http://localhost:3000/detalles/` + id_venta);
   }
 
-  postFactura(factura : Factura){
-    return this.http.post(`http://localhost:3000/facturacion/`, factura);
+  postFacturaAfip(factura : FacturaAfip){
+    return this.http.post(`http://localhost:3000/facturacionAfip/`, factura);
+  }
+
+  postFacturaLocal(factura : FacturaLocal){
+    return this.http.post(`http://localhost:3000/facturacionLocal/`, factura);
+  }
+
+  putVenta(id_venta : number){
+    return this.http.put(`http://localhost:3000/ventas/` + id_venta, null);
   }
 }

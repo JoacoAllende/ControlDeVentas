@@ -25,7 +25,6 @@ prodValidator.validar_getProductos = (req, res) => {
 prodValidator.validar_deleteProducto = (req, res) => {
     const id = req.params.id;
     if (!isNaN(id)) {
-        console.log('entro');
         prodController.deleteProducto(req, res);
     }
     else

@@ -1,7 +1,6 @@
 const ventaValidator = {};
 
 const ventaController = require('../controllers/venta.controller');
-const prodValidator = require('../validations/producto.validation');
 
 //SE DEBERÍA CONTROLAR QUE EXISTA EL CÓDIGO Y QUE COINCIDA EL PRECIO DEL DETALLE CON LA MULTIPLICACIÓN DEL PRECIO DEL PRODUCTO CON LA CANTIDAD
 ventaValidator.validar_createVenta = (req, res) => {
@@ -25,6 +24,10 @@ ventaValidator.validar_getVentasFecha = (req, res) => {
 
 ventaValidator.validar_getDetallesVenta = (req, res) => {
     ventaController.getDetallesVenta(req, res);
+}
+
+ventaValidator.validar_updateVenta = (req, res) => {
+    ventaController.updateVenta(req, res);
 }
 
 module.exports = ventaValidator;

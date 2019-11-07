@@ -5,7 +5,6 @@ const mysqlConnection = require('../database');
 ventaCtrl.createVenta = (req, res) => {
     const venta = req.body;
     const query = 'INSERT INTO venta (id_cliente, fecha, total) VALUES (1, CURDATE(), ' + venta.total + ');';
-    console.log(query);
     mysqlConnection.query(query, (err) => {
         if (!err) {
             const query_id_venta = 'SELECT last_insert_id() AS id_venta';
@@ -16,15 +15,15 @@ ventaCtrl.createVenta = (req, res) => {
                     query_detalles = "INSERT INTO detalle_venta (id_venta, id_detalle, id_producto, cantidad, precio_detalle) VALUES"
                     venta.detalles.forEach(detalle => {
                         query_detalles += '(' + id_venta + ',' + id_detalle + ',' + detalle.id_producto + ',' + detalle.cantidad + ','
-                         + detalle.precio_detalle + '),';
-                         id_detalle++;
+                            + detalle.precio_detalle + '),';
+                        id_detalle++;
                     });
                     query_detalles = query_detalles.slice(0, -1);
                     query_detalles += ';';
                     mysqlConnection.query(query_detalles, (err, rows) => {
                         if (!err) {
                             res.json({
-                                'status' : 'created'
+                                'status': 'created'
                             })
                         } else {
                             res.json(err.errno);
@@ -40,10 +39,11 @@ ventaCtrl.createVenta = (req, res) => {
 
 ventaCtrl.getVentasFecha = (req, res) => {
     const fecha = req.params.fecha;
-    const query = 'SELECT c.nombre AS cliente, v.* FROM venta AS v INNER JOIN cliente AS c ON (c.id = v.id_cliente) WHERE fecha = "' 
-    + fecha + '"';
+    const query = 'SELECT c.nombre AS cliente, c.doc_tipo, c.doc_nro, v.* FROM venta AS v INNER JOIN cliente AS c ON (c.id = v.id_cliente) WHERE fecha = "'
+        + fecha + '"';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
+            console.log(rows);
             res.json(rows);
         } else {
             console.log(err);
@@ -60,6 +60,15 @@ ventaCtrl.getDetallesVenta = (req, res) => {
         } else {
             console.log(err);
         }
+    })
+}
+
+ventaCtrl.updateVenta = (req, res) => {
+    const id_venta = req.params.id_venta;
+    const query = "UPDATE venta SET facturado = true WHERE id = " + id_venta;
+    console.log(query);
+    mysqlConnection.query(query, () => {
+        res.json('updated');
     })
 }
 

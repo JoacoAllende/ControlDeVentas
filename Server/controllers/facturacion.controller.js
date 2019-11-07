@@ -1,7 +1,8 @@
 const facturaCtrl = {};
 const Afip = require('@afipsdk/afip.js');
+const mysqlConnection = require('../database');
 
-facturaCtrl.createFactura = async (req, res) => {
+facturaCtrl.createFacturaAfip = async (req, res) => {
     const afip = new Afip({ CUIT: 20379855068 });
     const factura = req.body;
     const docTipo = factura.docTipo;
@@ -38,6 +39,18 @@ facturaCtrl.createFactura = async (req, res) => {
     };
     const resFactura = await afip.ElectronicBilling.createNextVoucher(data);
     res.json(resFactura);
+}
+
+facturaCtrl.createFacturaLocal = async (req, res) => {
+    const factura = req.body;
+    const query = "INSERT INTO factura (id_venta, nro_cae, fecha_emision, cbte_tipo, pto_venta, nro_comprobante, id_cliente) VALUES (" + factura.id_venta + ", " + 
+                    factura.nro_cae + ", '" + factura.fecha_emision + "', " + factura.cbte_tipo + ", " + factura.pto_venta + ", " + factura.nro_comprobante + ", " + 
+                    factura.id_cliente + ");";
+    mysqlConnection.query(query, (err) => {
+        if (!err){
+            res.json({'status' : 'created'});
+        }
+    })
 }
 
 module.exports = facturaCtrl;
