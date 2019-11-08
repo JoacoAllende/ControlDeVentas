@@ -43,7 +43,6 @@ ventaCtrl.getVentasFecha = (req, res) => {
         + fecha + '"';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
-            console.log(rows);
             res.json(rows);
         } else {
             console.log(err);

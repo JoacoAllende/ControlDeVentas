@@ -8,6 +8,6 @@ factValidator.validar_createFacturaAfip = async (req, res) => {
 
 factValidator.validar_createFacturaLocal = async (req, res) => {
     factController.createFacturaLocal(req, res);
-} 
+}
 
 module.exports = factValidator;

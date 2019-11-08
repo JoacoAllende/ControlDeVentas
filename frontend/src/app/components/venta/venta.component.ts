@@ -200,7 +200,7 @@ export class VentaComponent implements OnInit {
           const nroComprobante = res['voucherNumber'];
           let nro_cae = res['CAE'];
           let cae_fec_vto = res['CAEFchVto'];
-          const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, form.value.cbteTipoSelected, 1, nroComprobante,  1);
+          const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, form.value.cbteTipoSelected, 1, nroComprobante, 1, tot);
           this.ventaService.postFacturaLocal(facturaLocal)
           .subscribe(res => {
             this.ventaService.putVenta(this.id_venta)

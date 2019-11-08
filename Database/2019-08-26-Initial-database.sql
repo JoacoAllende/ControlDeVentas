@@ -41,6 +41,7 @@ CREATE TABLE factura (
     pto_venta INT(2) NOT NULL,
     nro_comprobante INT(6) UNIQUE,
     id_cliente INT(4) NOT NULL,
+    imp_total NUMERIC(5,2) NOT NULL,
     FOREIGN KEY (id_venta) REFERENCES venta(id),
     FOREIGN KEY (id_cliente) REFERENCES cliente(id)
 );

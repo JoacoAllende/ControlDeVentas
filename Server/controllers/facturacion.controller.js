@@ -43,9 +43,9 @@ facturaCtrl.createFacturaAfip = async (req, res) => {
 
 facturaCtrl.createFacturaLocal = async (req, res) => {
     const factura = req.body;
-    const query = "INSERT INTO factura (id_venta, nro_cae, fecha_emision, cbte_tipo, pto_venta, nro_comprobante, id_cliente) VALUES (" + factura.id_venta + ", " + 
+    const query = "INSERT INTO factura (id_venta, nro_cae, fecha_emision, cbte_tipo, pto_venta, nro_comprobante, id_cliente, imp_total) VALUES (" + factura.id_venta + ", " + 
                     factura.nro_cae + ", '" + factura.fecha_emision + "', " + factura.cbte_tipo + ", " + factura.pto_venta + ", " + factura.nro_comprobante + ", " + 
-                    factura.id_cliente + ");";
+                    factura.id_cliente + ',' + factura.imp_total + ");";
     mysqlConnection.query(query, (err) => {
         if (!err){
             res.json({'status' : 'created'});
