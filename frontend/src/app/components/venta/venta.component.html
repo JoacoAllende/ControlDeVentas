@@ -3,7 +3,7 @@
     <button class="btn btn-default pull-right" (click)="iniciarVenta()" *ngIf="inicial">Iniciar venta</button>
     <button class="btn btn-default pull-right" (click)="verVentas()" *ngIf="inicial">Ver ventas</button>
     <div *ngIf="resumen">
-        <input type="date" [(ngModel)]="fecha" id="fecha" placeholder="dd-MM-yyyy" min="2019-01-01" max="2030-12-31"
+        <input type="date" [(ngModel)]="fecha" id="fecha"  min="2019-01-01" max="2030-12-31"
             required />
         <button class="btn btn-default" (click)="cambiarFecha(fecha)">Ver</button>
         <table class="table" id="productoTable" *ngIf="resumenVentas.length > 0">
@@ -17,7 +17,7 @@
                     <td>{{venta.cliente}}</td>
                     <td>{{venta.total | number : '1.2-2'}}</td>
                     <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
-                    <td (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado)" class="glyphicon glyphicon-folder-close"></td>
+                    <td (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado, venta.cliente)" class="glyphicon glyphicon-folder-close"></td>
                 </tr>
             </tbody>
         </table>
