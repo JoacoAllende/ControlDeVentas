@@ -20,6 +20,7 @@ app.use(cors({origin: 'http://localhost:4200'}))
 app.use(require('./routes/producto.routes'));
 app.use(require('./routes/venta.routes'));
 app.use(require('./routes/facturacion.routes'));
+app.use(require('./routes/cliente.routes'));
 
 // Starting the server
 
