@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { VentaComponent } from './components/venta/venta.component';
+import { FacturaComponent } from './components/factura/factura.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { VentaComponent } from './components/venta/venta.component';
     ProductoFilterCodigoPipe,
     ProductoFilterDescripcionPipe,
     MainNavComponent,
-    VentaComponent
+    VentaComponent,
+    FacturaComponent
   ],
   imports: [
     BrowserModule,

@@ -39,7 +39,8 @@ export class VentaComponent implements OnInit {
   docTipos: any[] = [
     { name: 'CUIT', value: 80 },
     { name: 'CUIL', value: 86 },
-    { name: 'DNI', value: 99 }
+    { name: 'DNI', value: 96 },
+    { name: 'Doc. (Otro)', value: 99}
   ];
   docTipoSelected;
   docNroSelected;

@@ -10,4 +10,8 @@ factValidator.validar_createFacturaLocal = async (req, res) => {
     factController.createFacturaLocal(req, res);
 }
 
+factValidator.validar_getFacturasFecha = (req, res) => {
+    factController.getFacturasFecha(req, res);
+}
+
 module.exports = factValidator;

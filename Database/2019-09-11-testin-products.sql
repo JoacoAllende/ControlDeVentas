@@ -21,5 +21,13 @@ INSERT INTO producto (codigo, descripcion, precio) VALUES
 ('733322244383','Mostaza Heinz 396 gr.', 219.99),
 ('733322444331','Mostaza Heinz 200 gr.', 75.8);
 
+INSERT INTO cbte_tipo (id, descripcion) VALUES (6, 'Factura B');
+INSERT INTO cbte_tipo (id, descripcion) VALUES (11, 'Factura C');
+
+INSERT INTO doc_tipo (id, descripcion) VALUES (80, 'CUIT');
+INSERT INTO doc_tipo (id, descripcion) VALUES (86, 'CUIL');
+INSERT INTO doc_tipo (id, descripcion) VALUES (96, 'DNI');
+INSERT INTO doc_tipo (id, descripcion) VALUES (99, 'Doc. (Otro)');
+
 INSERT INTO cliente (nombre, doc_tipo, doc_nro) VALUES ('Consumidor final', 99, 0);
 INSERT INTO cliente (nombre, doc_tipo, doc_nro) VALUES ('Fernando Allende', 80, 20161379671);

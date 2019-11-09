@@ -1,9 +1,20 @@
+CREATE TABLE cbte_tipo (
+    id INT(3) PRIMARY KEY,
+    descripcion VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE doc_tipo (
+    id INT(3) PRIMARY KEY,
+    descripcion VARCHAR(12) NOT NULL
+);
+
 CREATE TABLE cliente (
     id INT(4) AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     doc_tipo INT(2) NOT NULL,
     doc_nro BIGINT(14) NOT NULL,
-    telefono VARCHAR(18) NULL
+    telefono VARCHAR(18) NULL,
+    FOREIGN KEY(doc_tipo) REFERENCES doc_tipo(id)
 );
 
 CREATE TABLE producto (
@@ -43,5 +54,6 @@ CREATE TABLE factura (
     id_cliente INT(4) NOT NULL,
     imp_total NUMERIC(5,2) NOT NULL,
     FOREIGN KEY (id_venta) REFERENCES venta(id),
-    FOREIGN KEY (id_cliente) REFERENCES cliente(id)
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id),
+    FOREIGN KEY (cbte_tipo) REFERENCES cbte_tipo(id)
 );

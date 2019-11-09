@@ -53,4 +53,17 @@ facturaCtrl.createFacturaLocal = async (req, res) => {
     })
 }
 
+facturaCtrl.getFacturasFecha = (req, res) => {
+    const fecha = req.params.fecha;
+    const query = 'Select f.nro_cae, f.fecha_emision, ct.descripcion AS cbte_tipo, f.pto_venta, f.nro_comprobante, f.imp_total, dt.descripcion AS doc_tipo, c.doc_nro FROM factura f INNER JOIN cliente c ON (c.id = f.id_cliente) INNER JOIN cbte_tipo ct ON (f.cbte_tipo = ct.id) INNER JOIN doc_tipo dt ON (dt.id = c.doc_tipo) INNER JOIN venta v ON (v.id = f.id_venta) WHERE v.fecha = "'
+        + fecha + '"';
+    mysqlConnection.query(query, (err, rows, fields) => {
+        if (!err) {
+            res.json(rows);
+        } else {
+            console.log(err);
+        }
+    })
+};
+
 module.exports = facturaCtrl;

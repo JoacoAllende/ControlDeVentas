@@ -1,0 +1,30 @@
+<div class="container">
+    <h1 class="text-center">FACTURAS</h1>
+    <div class="container">
+        <input type="date" [(ngModel)]="fecha" id="fecha" min="2019-01-01" max="2030-12-31" required />
+        <button class="btn btn-default" (click)="cambiarFecha(fecha)">Ver</button>
+        <table class="table" id="facturaTable">
+            <thead class="text-center">
+                <th>Nro. CAE</th>
+                <th>Fecha emisión</th>
+                <th>Tipo comprobante</th>
+                <th>Nro. comprobante</th>
+                <th>Imp. Total</th>
+                <th>Tipo documento</th>
+                <th>Nro. documento</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let factura of facturas | paginate: { itemsPerPage: 20, currentPage: actualPageFacturas }">
+                    <td>{{factura.nro_cae}}</td>
+                    <td>{{factura.fecha_emision | date:'mediumDate'}}</td>
+                    <td>{{factura.cbte_tipo}}</td>
+                    <td>{{factura.nro_comprobante}}</td>
+                    <td>{{factura.imp_total | number : '1.2-2'}}</td>
+                    <td>{{factura.doc_tipo}}</td>
+                    <td>{{factura.doc_nro}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <pagination-controls (pageChange)="actualPage = $event"></pagination-controls>
+    </div>
+</div>
