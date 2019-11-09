@@ -3,7 +3,7 @@ const clienteCtrl = {};
 const mysqlConnection = require('../database');
 
 clienteCtrl.getClientes = (req, res) => {
-    const query = 'SELECT c.*, dt.descripcion FROM cliente c INNER JOIN doc_tipo dt ON (dt.id = c.doc_tipo);';
+    const query = 'SELECT c.*, dt.descripcion FROM cliente c INNER JOIN doc_tipo dt ON (dt.id = c.doc_tipo) WHERE c.id != 1;';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
             res.json(rows);

@@ -19,6 +19,7 @@ import { MatListModule } from '@angular/material/list';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { VentaComponent } from './components/venta/venta.component';
 import { FacturaComponent } from './components/factura/factura.component';
+import { ClienteComponent } from './components/cliente/cliente.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { FacturaComponent } from './components/factura/factura.component';
     ProductoFilterDescripcionPipe,
     MainNavComponent,
     VentaComponent,
-    FacturaComponent
+    FacturaComponent,
+    ClienteComponent
   ],
   imports: [
     BrowserModule,

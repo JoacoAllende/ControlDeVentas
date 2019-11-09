@@ -1,0 +1,67 @@
+<div class="container">
+    <div class="container">
+        <h1 class="text-center">CLIENTES</h1>
+        <div class="container">
+            <table class="table" id="clienteTable">
+                <thead class="text-center">
+                    <th>Cliente</th>
+                    <th>Tipo documento</th>
+                    <th>Nro. documento</th>
+                    <th>Telefono</th>
+                    <th *ngIf="edicion">Editar</th>
+                    <th *ngIf="edicion">Eliminar</th>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let cliente of clientes | paginate: { itemsPerPage: 10, currentPage: actualPageClientes }">
+                        <td>{{cliente.nombre}}</td>
+                        <td>{{cliente.descripcion}}</td>
+                        <td>{{cliente.doc_nro}}</td>
+                        <td>{{cliente.telefono}}</td>
+                        <td><a (click)="editCliente(cliente)" *ngIf="edicion">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </a></td>
+                        <td><a (click)="deleteCliente(cliente.id)" *ngIf="edicion">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </a></td>
+                    </tr>
+                </tbody>
+            </table>
+            <pagination-controls (pageChange)="actualPage = $event"></pagination-controls>
+        </div>
+    </div>
+    <form role="form" #clienteForm="ngForm" name='clienteForm' *ngIf="edicion">
+        <input type="hidden" name="id" [(ngModel)]="clienteService.selectedCliente.id" #id="ngModel">
+        <input type="hidden" name="doc_tipo" [(ngModel)]="clienteService.selectedCliente.doc_tipo" #doc_tipo="ngModel">
+        <div class="form-group">
+            <label for="Cliente">Cliente</label>
+            <input type="text" class="form-control" name="nombre" [(ngModel)]="clienteService.selectedCliente.nombre"
+                #cliente="ngModel" placeholder="Razón social" required="required">
+        </div>
+        <div class="form-group">
+            <label for="doc_tipo">Tipo de documento</label>
+            <div class="select">
+                <select [(ngModel)]="docTipoSelected" name="doc_tipo" required>
+                    <option *ngFor="let docTipo of docTipos" [value]="docTipo.value">{{docTipo.name}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="doc_nro">Nro. de documento</label>
+            <input type="number" class="form-control" name="doc_nro"
+                [(ngModel)]="clienteService.selectedCliente.doc_nro" #docNro="ngModel" placeholder="Nro. de documento"
+                required="required">
+        </div>
+        <div class="form-group">
+            <label for="Telefono">Teléfono</label>
+            <input type="text" class="form-control" name="telefono"
+                [(ngModel)]="clienteService.selectedCliente.telefono" #telefono="ngModel" placeholder="Teléfono"
+                required="required">
+        </div>
+        <button type="submit" class="btn btn-default" (click)="CheckValidation(clienteForm)">Enviar</button>
+        <button type="submit" class="btn btn-default" (click)="resetForm(clienteForm)">Limpiar</button>
+        <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial()">Salir</button>
+    </form>
+    <button type="submit" class="btn btn-default pull-right" (click)="habilitarEdicion()"
+        *ngIf="inicial">Editar</button>
+</div>
