@@ -1,4 +1,4 @@
-import { Component, OnInit, ɵConsole } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { DetalleVenta } from 'src/app/models/detalle-venta';
 import { VentaService } from '../../services/venta.service';
 import { Producto } from 'src/app/models/producto';
@@ -8,6 +8,8 @@ import * as jsPDF from 'jspdf';
 import { FacturaAfip } from 'src/app/models/facturaAfip';
 import { NgForm } from '@angular/forms';
 import { FacturaLocal } from 'src/app/models/facturaLocal';
+import { Cliente } from 'src/app/models/cliente';
+import { ClienteService } from 'src/app/services/cliente.service';
 
 @Component({
   selector: 'app-venta',
@@ -21,17 +23,21 @@ export class VentaComponent implements OnInit {
   venta = false;
   resumen = false;
   factura = false;
+  edicion = false;
   //ELEMENTOS DE LA VENTA
   public detallesVenta: DetalleVenta[] = [];
   public detallesVentaResumen: DetalleVenta[] = [];
   public resumenVentas: Venta[] = [];
   public resumenVentasObservable: Observable<Venta[]>;
   public detallesVentaObservable: Observable<DetalleVenta[]>;
+  public clientes: Cliente[] = [];
+  public clientesObs: Observable<Cliente[]>;
   codigo: number;
   cantidad: number;
   total: number = 0;
   id_venta;
   fecha;
+  clienteSelected = 1;
   //PAGINACIÓN
   actualPageVentas: number = 1;
   actualPageDetalles: number = 1;
@@ -50,8 +56,10 @@ export class VentaComponent implements OnInit {
     { name: 'Factura C', value: 11 }
   ];
   cbteTipoSelected = 11;
+  //FILTRO PIPE
+  busquedaNombre: string;
 
-  constructor(private ventaService: VentaService) { }
+  constructor(private ventaService: VentaService, private clienteService: ClienteService) { }
 
   ngOnInit() {
     const hoy = new Date();
@@ -68,6 +76,8 @@ export class VentaComponent implements OnInit {
     this.cambiarFecha(fecha);
     this.detallesVentaObservable = this.ventaService.getDetalles(this.id_venta);
     this.detallesVentaObservable.subscribe(det => this.detallesVenta = det);
+    this.clientesObs = this.clienteService.getAllClientes();
+    this.clientesObs.subscribe(cl => this.clientes = cl);
   }
 
   // GENERACIÓN DE VENTA EN MEMORIA
@@ -128,12 +138,35 @@ export class VentaComponent implements OnInit {
 
   finalizarVenta() {
     if (confirm('Desea finalizar la venta?')) {
-      const venta = new Venta(this.total, this.detallesVenta)
+      const venta = new Venta(null, this.clienteSelected, this.total, this.detallesVenta)
       this.ventaService.postVenta(venta)
         .subscribe(res => {
         })
       this.habilitarInicial();
     }
+  }
+
+  modificarVenta(id_cliente){
+    if (id_cliente != '') {
+      if (confirm('Desea modificar el cliente de la venta?')) {
+        const venta = new Venta(this.id_venta, id_cliente, null, null);
+        this.ventaService.putVentaCliente(this.id_venta,venta)
+          .subscribe(res => {
+            this.resumenVentasObservable.subscribe(vent => this.resumenVentas = vent);
+            this.edicion = false;
+          })
+      }
+      this.busquedaNombre = '';
+    } else {
+      alert('Se debe seleccionar un cliente');
+      this.edicion = false;
+      this.busquedaNombre = '';
+    }
+  }
+
+  cancelarModificarVenta(){
+    this.edicion = false;
+    this.busquedaNombre = '';
   }
 
   // VENTAS
@@ -158,6 +191,7 @@ export class VentaComponent implements OnInit {
 
   getDetalles(id_venta) {
     this.total = 0;
+    this.factura = false;
     this.ventaService.getDetalles(id_venta)
       .subscribe(res => {
         this.id_venta = id_venta;
@@ -174,7 +208,7 @@ export class VentaComponent implements OnInit {
 
   // FACTURACIÓN
 
-  comenzarFactura(id_venta, total, docTipo, docNro, facturado, razonSocial) {
+  comenzarFactura(id_venta, total, docTipo, docNro, facturado, razonSocial, id_cliente) {
     if (!facturado) {
       this.total = total;
       this.id_venta = id_venta;
@@ -183,6 +217,7 @@ export class VentaComponent implements OnInit {
       this.razonSocialSelected = razonSocial;
       this.factura = true;
       this.detallesVenta = [];
+      this.clienteSelected = id_cliente;
     } else {
       alert('La venta ya ha sido facturada');
       this.factura = false;
@@ -201,7 +236,7 @@ export class VentaComponent implements OnInit {
           const nroComprobante = res['voucherNumber'];
           let nro_cae = res['CAE'];
           let cae_fec_vto = res['CAEFchVto'];
-          const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, form.value.cbteTipoSelected, 1, nroComprobante, 1, tot);
+          const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, this.cbteTipoSelected, 1, nroComprobante, this.clienteSelected, tot);
           this.ventaService.postFacturaLocal(facturaLocal)
           .subscribe(res => {
             this.ventaService.putVenta(this.id_venta)
@@ -218,6 +253,12 @@ export class VentaComponent implements OnInit {
 
   }
 
+  editVenta(venta) {
+    this.clienteSelected = venta.id_cliente;
+    this.id_venta = venta.id_venta;
+    this.edicion = true;
+  }
+
   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
 
   iniciarVenta() {
@@ -229,13 +270,17 @@ export class VentaComponent implements OnInit {
     this.resumen = false;
     this.detallesVenta = [];
     this.total = 0;
+    this.clienteSelected = 1;
   }
 
   habilitarInicial() {
     this.inicial = true;
     this.venta = false
     this.resumen = false;
+    this.factura = false;
+    this.edicion = false;
     this.detallesVenta = [];
+    this.busquedaNombre = '';
     this.total = 0;
     this.cantidad = null;
     this.codigo = null

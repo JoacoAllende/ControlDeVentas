@@ -25,6 +25,10 @@ export class ClienteService {
     return this.http.get<Cliente[]>(`http://localhost:3000/clientes`);
    }
 
+   getAllClientes(){
+    return this.http.get<Cliente[]>(`http://localhost:3000/Allclientes`);
+   }
+
    deleteCliente(id: number){
      return this.http.delete(`http://localhost:3000/clientes/` + id);
    }

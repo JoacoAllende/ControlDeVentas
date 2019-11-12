@@ -3,36 +3,54 @@
     <button class="btn btn-default pull-right" (click)="iniciarVenta()" *ngIf="inicial">Iniciar venta</button>
     <button class="btn btn-default pull-right" (click)="verVentas()" *ngIf="inicial">Ver ventas</button>
     <div *ngIf="resumen">
-        <input type="date" [(ngModel)]="fecha" id="fecha"  min="2019-01-01" max="2030-12-31"
-            required />
+        <input type="date" [(ngModel)]="fecha" id="fecha" min="2019-01-01" max="2030-12-31" required />
         <button class="btn btn-default" (click)="cambiarFecha(fecha)">Ver</button>
         <table class="table" id="productoTable" *ngIf="resumenVentas.length > 0">
             <thead class="text-center">
                 <th>Cliente</th>
                 <th>Total</th>
                 <th>Detalles</th>
+                <th>Modificar</th>
+                <th>Facturar</th>
             </thead>
             <tbody>
                 <tr *ngFor="let venta of resumenVentas | paginate: { itemsPerPage: 8, currentPage: actualPageVentas }">
                     <td>{{venta.cliente}}</td>
                     <td>{{venta.total | number : '1.2-2'}}</td>
                     <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
-                    <td (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado, venta.cliente)" class="glyphicon glyphicon-folder-close"></td>
+                    <td><a (click)="editVenta(venta)">
+                            <i class="glyphicon glyphicon-pencil"></i>
+                        </a></td>
+                    <td (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado, venta.cliente, venta.id_cliente)"
+                        class="glyphicon glyphicon-folder-close"></td>
                 </tr>
             </tbody>
         </table>
         <pagination-controls (pageChange)="actualPageVentas = $event"></pagination-controls>
         <button class="btn btn-default" (click)="habilitarInicial()">Salir</button>
+        <div class="espacio"></div>
     </div>
-    <div *ngIf="venta">
-        <div class="col-md-6 form-group">
+    <div *ngIf="venta || edicion">
+        <label for="idCliente">Cliente</label>
+        <input type="text" placeholder="Ingresar nombre" [(ngModel)]="busquedaNombre">
+        <div class="espacio"></div>
+        <div class="select">
+            <select [(ngModel)]="clienteSelected" #clienteSelect name="clienteSelected" required>
+                <option *ngFor="let cliente of clientes | nombreFilter:busquedaNombre" [value]="cliente.id">{{cliente.nombre}}</option>
+            </select>
+        </div>
+        <div class="espacio"></div>
+        <button type="submit" *ngIf="edicion" class="btn btn-default" (click)="cancelarModificarVenta()">Cancelar</button>
+        <button type="submit" *ngIf="edicion" class="btn btn-default" (click)="modificarVenta(clienteSelect.value)">Modificar</button>
+        <div *ngIf="venta" class="espacio"></div>
+        <div *ngIf="venta" class="col-md-6 form-group">
             <input (keydown)="onKeydown($event)" type="number" placeholder="Código" [(ngModel)]="codigo"
                 id="codigoProducto" minlength="12" maxlength="12">
         </div>
-        <div class="col-md-6 form-group">
+        <div *ngIf="venta" class="col-md-6 form-group">
             <input (keydown)="onKeydown($event)" type="number" placeholder="Cantidad" min="1" [(ngModel)]="cantidad">
         </div>
-        <div class="pull-right">
+        <div class="pull-right" *ngIf="venta">
             <button type="submit" class="btn btn-default" (click)="addProducto(codigo, cantidad)">Agregar</button>
             <button class="btn btn-default" (click)="habilitarInicial()">Cancelar venta</button>
         </div>
@@ -65,7 +83,7 @@
             </tfoot>
         </table>
         <pagination-controls (pageChange)="actualPageDetalles = $event"></pagination-controls>
-        <button type="submit" class="btn btn-default pull-right" (click)="finalizarVenta(total)" *ngIf="venta">Finalizar
+        <button type="submit" class="btn btn-default pull-right" (click)="finalizarVenta()" *ngIf="venta">Finalizar
             venta</button>
         <button type="submit" class="btn btn-default" (click)="cancelar()">Cancelar detalles</button>
     </div>
@@ -85,7 +103,8 @@
             </div>
             <label for="tipoDocumento">Nro. de documento</label>
             <div>
-                <input type="number" name="dniNro" placeholder="Nro Documento" readonly [(ngModel)]="docNroSelected" required>
+                <input type="number" name="dniNro" placeholder="Nro Documento" readonly [(ngModel)]="docNroSelected"
+                    required>
             </div>
             <label for="tipoDocumento">Importe Neto</label>
             <div>

@@ -30,4 +30,8 @@ ventaValidator.validar_updateVenta = (req, res) => {
     ventaController.updateVenta(req, res);
 }
 
+ventaValidator.validar_updateVentaCliente = (req, res) => {
+    ventaController.updateVentaCliente(req, res);
+}
+
 module.exports = ventaValidator;

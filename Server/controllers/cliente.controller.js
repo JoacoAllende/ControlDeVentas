@@ -13,6 +13,17 @@ clienteCtrl.getClientes = (req, res) => {
     })
 };
 
+clienteCtrl.getAllClientes = (req, res) => {
+    const query = 'SELECT id, nombre FROM cliente;';
+    mysqlConnection.query(query, (err, rows, fields) => {
+        if (!err) {
+            res.json(rows);
+        } else {
+            console.log(err);
+        }
+    })
+};
+
 clienteCtrl.createCliente = (req, res) => {
     const cliente = req.body;
     const query = 'INSERT INTO cliente (nombre, doc_tipo, doc_nro, telefono) VALUES ("' + cliente.nombre + '",' + cliente.doc_tipo

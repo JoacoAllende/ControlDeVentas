@@ -48,4 +48,8 @@ export class VentaService {
   putVenta(id_venta : number){
     return this.http.put(`http://localhost:3000/ventas/` + id_venta, null);
   }
+
+  putVentaCliente(id_venta: number, venta: Venta){
+    return this.http.put(`http://localhost:3000/ventas/cliente/` + id_venta, venta);
+  }
 }

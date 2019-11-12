@@ -10,6 +10,10 @@ clienteValidator.validar_getClientes = (req, res) => {
     clienteController.getClientes(req, res);
 }
 
+clienteValidator.validar_getAllClientes = (req, res) => {
+    clienteController.getAllClientes(req, res);
+}
+
 clienteValidator.validar_deleteCliente = (req, res) => {
     clienteController.deleteCliente(req, res);
 }
