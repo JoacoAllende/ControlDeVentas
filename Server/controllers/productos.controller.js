@@ -13,6 +13,18 @@ productoCtrl.getProductos = (req, res) => {
     })
 };
 
+productoCtrl.getProducto = (req, res) => {
+    const codigo = req.params.codigo;
+    const query = 'SELECT * FROM producto WHERE codigo = ' + codigo;
+    mysqlConnection.query(query, (err, rows, fields) => {
+        if (!err) {
+            res.json(rows);
+        } else {
+            console.log(err);
+        }
+    })
+};
+
 productoCtrl.createProducto = (req, res) => {
     const producto = req.body;
     const query = 'INSERT INTO producto (codigo, descripcion, precio) VALUES ("' + producto.codigo + '","' + producto.descripcion
@@ -46,7 +58,6 @@ productoCtrl.updateProducto = (req, res) => {
 productoCtrl.deleteProducto = (req, res) => {
     const id = req.params.id;
     const query = 'DELETE FROM producto WHERE id = ' + id;
-    console.log(query);
     mysqlConnection.query(query, () =>{
         res.json('deleted');
     })

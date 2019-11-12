@@ -17,6 +17,10 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { VentaComponent } from './components/venta/venta.component';
+import { FacturaComponent } from './components/factura/factura.component';
+import { ClienteComponent } from './components/cliente/cliente.component';
+import { VentaFilterCodigoPipe } from './components/venta/venta-filter-nombre.pipe';
 
 @NgModule({
   declarations: [
@@ -24,7 +28,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ProductoComponent,
     ProductoFilterCodigoPipe,
     ProductoFilterDescripcionPipe,
-    MainNavComponent
+    VentaFilterCodigoPipe,
+    MainNavComponent,
+    VentaComponent,
+    FacturaComponent,
+    ClienteComponent
   ],
   imports: [
     BrowserModule,
