@@ -192,6 +192,7 @@ export class VentaComponent implements OnInit {
   getDetalles(id_venta) {
     this.total = 0;
     this.factura = false;
+    this.edicion = false;
     this.ventaService.getDetalles(id_venta)
       .subscribe(res => {
         this.id_venta = id_venta;
@@ -216,11 +217,15 @@ export class VentaComponent implements OnInit {
       this.docNroSelected = docNro;
       this.razonSocialSelected = razonSocial;
       this.factura = true;
-      this.detallesVenta = [];
       this.clienteSelected = id_cliente;
+      this.ventaService.getDetalles(id_venta)
+      .subscribe(res => {
+        this.id_venta = id_venta;
+      })
     } else {
       alert('La venta ya ha sido facturada');
       this.factura = false;
+      this.detallesVenta = [];
     }
   }
 
@@ -241,9 +246,15 @@ export class VentaComponent implements OnInit {
           .subscribe(res => {
             this.ventaService.putVenta(this.id_venta)
             .subscribe(res => {
-              this.facturaPdf(this.cbteTipos.find(o => o.value === this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
-                              this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto);
-              this.factura = false;
+              this.ventaService.getDetalles(this.id_venta)
+              .subscribe(res => {
+                this.detallesVenta = res as DetalleVenta[];
+                this.facturaPdf(this.cbteTipos.find(o => o.value === this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
+                                this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                this.factura = false;
+                this.edicion = false;
+                this.detallesVenta = [];
+              })
             })
           })
           
@@ -257,6 +268,8 @@ export class VentaComponent implements OnInit {
     this.clienteSelected = venta.id_cliente;
     this.id_venta = venta.id_venta;
     this.edicion = true;
+    this.factura = false;
+    this.detallesVenta = [];
   }
 
   // HABILITAR DIFERENTES ELEMENTOS DEL COMPONENTE
@@ -292,88 +305,106 @@ export class VentaComponent implements OnInit {
     }
   }
 
-  facturaPdf(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto) {
+  facturaPdf(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto, detallesVenta) {
     const doc = new jsPDF();
-    //ORIGINAL
-    doc.rect(10, 6, doc.internal.pageSize.width - 20, 10, 'S');
-    doc.text('ORIGINAL', doc.internal.pageSize.width / 2, 13.2, 'center');
-    //PRIMER RECTÁNGULO
-    doc.rect(10, 16, doc.internal.pageSize.width - 20, 60, 'S');
-    doc.line(doc.internal.pageSize.width / 2, 30, doc.internal.pageSize.width / 2, 76);
-    //CUADRO TIPO FACTURA
-    doc.rect(doc.internal.pageSize.width / 2 - 7, 16, 14, 14, 'S');
-    doc.setFontSize(24);
-    doc.text(tipoFactura[tipoFactura.length - 1], doc.internal.pageSize.width / 2, 24, 'center');
-    doc.setFontSize(8);
-    let cod = 'COD. ';
-    for (let index = 0; index < (3 - codFactura.toString().length); index++) {
-      cod += '0'
+    const cantHojas = Math.floor(detallesVenta.length / 28);
+    let array;
+    for (let index = 0; index <= cantHojas; index++) {
+      if (index < cantHojas) {
+        array = detallesVenta.slice(index * 28, index * 28 + 27);  
+      } else {
+        array = detallesVenta.slice(index * 28, detallesVenta.length);  
+      }
+      //ORIGINAL
+      doc.rect(10, 6, doc.internal.pageSize.width - 20, 10, 'S');
+      doc.text('ORIGINAL', doc.internal.pageSize.width / 2, 13.2, 'center');
+      //PRIMER RECTÁNGULO
+      doc.rect(10, 16, doc.internal.pageSize.width - 20, 60, 'S');
+      doc.line(doc.internal.pageSize.width / 2, 30, doc.internal.pageSize.width / 2, 76);
+      //CUADRO TIPO FACTURA
+      doc.rect(doc.internal.pageSize.width / 2 - 7, 16, 14, 14, 'S');
+      doc.setFontSize(24);
+      doc.text(tipoFactura[tipoFactura.length - 1], doc.internal.pageSize.width / 2, 24, 'center');
+      doc.setFontSize(8);
+      let cod = 'COD. ';
+      for (let index = 0; index < (3 - codFactura.toString().length); index++) {
+        cod += '0'
+      }
+      cod += codFactura;
+      doc.text(cod, doc.internal.pageSize.width / 2, 28, 'center');
+      //PRIMER SUBRECTANGULO
+      doc.setFontSize(20);
+      doc.text('ALLENDE JOAQUIN', ((doc.internal.pageSize.width / 2)) / 2, 25, 'center');
+      doc.setFontSize(12);
+      doc.text('Razón Social: Allende Joaquín', 15, 35, 'left');
+      doc.text('Domicilio comercial: Av. Buzón 452 Piso: PB \n Depto. 3 - Tandil, Buenos Aires', 15, 45, 'left');
+      doc.text('Condición frente al IVA: Responsable \n Monotributo', 15, 60, 'left');
+      //SEGUNDO SUBRECTANGULO
+      doc.setFontSize(20);
+      doc.text('FACTURA', (doc.internal.pageSize.width / 2) + 10, 25, 'left');
+      doc.setFontSize(11);
+      let nroComp = '';
+      for (let index = 0; index < (8 - nroComprobante.toString().length); index++) {
+         nroComp += '0'
+      }
+      nroComp += nroComprobante;
+      doc.text('Punto de Venta: 00001    Comp. Nro: ' + nroComp,(doc.internal.pageSize.width / 2) + 5, 35, 'left');
+      doc.text('Fecha de Emisión:  ' + fechaEmision,(doc.internal.pageSize.width / 2) + 5, 42, 'left');
+      doc.text('CUIT:  20379855068',(doc.internal.pageSize.width / 2) + 5, 52, 'left');
+      doc.text('Ingresos Brutos:  2037985506',(doc.internal.pageSize.width / 2) + 5, 59, 'left');
+      doc.text('Fecha de Inicio de Actividades:  01/12/2018',(doc.internal.pageSize.width / 2) + 5, 66, 'left');
+      //SEGUNDO RECTANGULO
+      let documentoCompleto = tipoDocumento + ': ' + nroDocumento;
+      doc.rect(10, 78, doc.internal.pageSize.width - 20, 11, 'S');
+      doc.text(documentoCompleto, 15, 85, 'left');
+      doc.text('Razón Social: ' + razonSocial, (doc.internal.pageSize.width / 2) + 5, 85, 'left');
+      //TITULOS DETALLES
+      doc.setFontSize(9);
+      doc.setDrawColor(0);
+      doc.setFillColor(169,169,169);
+      doc.rect(10, 91, doc.internal.pageSize.width - 20, 10, 'FD');
+      doc.text('Descripción', 20, 96, 'left');
+      doc.text('Cantidad', 85, 96, 'left');
+      doc.text('U. medida', 105, 96, 'left');
+      doc.text('Precio Unit.', 125, 96, 'left');
+      doc.text('% Bonif.', 145, 96, 'left');
+      doc.text('Imp. Bonif.', 165, 96, 'left');
+      doc.text('Subtotal', 185, 96, 'left');
+      //DETALLES
+      doc.setFontSize(8);
+      let altura = 108;
+      array.forEach(element => {
+        if (element.descripcion.length > 50)
+          element.descripcion = element.descripcion.substring(0,49);
+        doc.text(element.descripcion, 10, altura, 'left');
+        doc.text(element.cantidad.toString(), 100, altura, 'right');
+        doc.text('unidades', 115, altura, 'center');
+        doc.text((element.precio_detalle / element.cantidad).toString(), 140, altura, 'right');
+        doc.text('0.00', 160, altura, 'right');
+        doc.text('0.00', 180, altura, 'right');
+        doc.text(element.precio_detalle.toString(), 198, altura, 'right');
+        altura += 4;
+      });
+      //RECTANGULO FINAL
+      doc.setFontSize(10);
+      doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
+      doc.text('Subtotal: $', 165, 230, 'right');
+      doc.text(impTotal.toString(), 198, 230, 'right');
+      doc.text('Imp. Otros Tributos: $', 165, 240, 'right');
+      doc.text('  0.00', 198, 240, 'right');
+      doc.text('Importe Total: $', 165, 250, 'right');
+      doc.text(impTotal.toString(), 198, 250, 'right');
+      //CAE Y FEC. VENC.
+      doc.setFontSize(11);
+      doc.text('CAE N°: ', 166, 266, 'right');
+      doc.text(nro_cae, 168, 266, 'left');
+      doc.text('Fecha de Vto. de CAE: ', 166, 273, 'right');
+      let fechaDividida = cae_fec_vto.split('-');
+      let fecha = fechaDividida[2] + '/' + fechaDividida[1] + '/' + fechaDividida[0];
+      doc.text(fecha, 168, 273, 'left');
+      if (index < cantHojas)
+        doc.addPage();
     }
-    cod += codFactura;
-    doc.text(cod, doc.internal.pageSize.width / 2, 28, 'center');
-    //PRIMER SUBRECTANGULO
-    doc.setFontSize(20);
-    doc.text('ALLENDE JOAQUIN', ((doc.internal.pageSize.width / 2)) / 2, 25, 'center');
-    doc.setFontSize(12);
-    doc.text('Razón Social: Allende Joaquín', 15, 35, 'left');
-    doc.text('Domicilio comercial: Av. Buzón 452 Piso: PB \n Depto. 3 - Tandil, Buenos Aires', 15, 45, 'left');
-    doc.text('Condición frente al IVA: Responsable \n Monotributo', 15, 60, 'left');
-    //SEGUNDO SUBRECTANGULO
-    doc.setFontSize(20);
-    doc.text('FACTURA', (doc.internal.pageSize.width / 2) + 10, 25, 'left');
-    doc.setFontSize(11);
-    let nroComp = '';
-    for (let index = 0; index < (8 - nroComprobante.toString().length); index++) {
-       nroComp += '0'
-    }
-    nroComp += nroComprobante;
-    doc.text('Punto de Venta: 00001    Comp. Nro: ' + nroComp,(doc.internal.pageSize.width / 2) + 5, 35, 'left');
-    doc.text('Fecha de Emisión:  ' + fechaEmision,(doc.internal.pageSize.width / 2) + 5, 42, 'left');
-    doc.text('CUIT:  20379855068',(doc.internal.pageSize.width / 2) + 5, 52, 'left');
-    doc.text('Ingresos Brutos:  2037985506',(doc.internal.pageSize.width / 2) + 5, 59, 'left');
-    doc.text('Fecha de Inicio de Actividades:  01/12/2018',(doc.internal.pageSize.width / 2) + 5, 66, 'left');
-    //SEGUNDO RECTANGULO
-    let documentoCompleto = tipoDocumento + ': ' + nroDocumento;
-    doc.rect(10, 78, doc.internal.pageSize.width - 20, 11, 'S');
-    doc.text(documentoCompleto, 15, 85, 'left');
-    doc.text('Razón Social: ' + razonSocial, (doc.internal.pageSize.width / 2) + 5, 85, 'left');
-    //TITULOS DETALLES
-    doc.setFontSize(9);
-    doc.setDrawColor(0);
-    doc.setFillColor(169,169,169);
-    doc.rect(10, 91, doc.internal.pageSize.width - 20, 10, 'FD');
-    doc.text('Código', 20, 96, 'left');
-    doc.text('Descripción', 40, 96, 'left');
-    doc.text('Cantidad', 85, 96, 'left');
-    doc.text('U. medida', 105, 96, 'left');
-    doc.text('Precio Unit.', 125, 96, 'left');
-    doc.text('% Bonif.', 145, 96, 'left');
-    doc.text('Imp. Bonif.', 165, 96, 'left');
-    doc.text('Subtotal', 185, 96, 'left');
-    //DETALLES
-    doc.setFontSize(8);
-    doc.text('Venta de producto varios', 40, 108, 'left');
-    doc.text('1.00', 100, 108, 'right');
-    doc.text('unidades', 115, 108, 'center');
-    doc.text(impTotal.toString(), 140, 108, 'right');
-    doc.text('0.00', 160, 108, 'right');
-    doc.text('0.00', 180, 108, 'right');
-    doc.text(impTotal.toString(), 198, 108, 'right');
-    //RECTANGULO FINAL
-    doc.setFontSize(10);
-    doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
-    doc.text('Subtotal: $', 165, 230, 'right');
-    doc.text(impTotal.toString(), 198, 230, 'right');
-    doc.text('Imp. Otros Tributos: $', 165, 240, 'right');
-    doc.text('  0.00', 198, 240, 'right');
-    doc.text('Importe Total: $', 165, 250, 'right');
-    doc.text(impTotal.toString(), 198, 250, 'right');
-    //CAE Y FEC. VENC.
-    doc.setFontSize(11);
-    doc.text('CAE N°: ', 166, 266, 'right');
-    doc.text(nro_cae, 168, 266, 'left');
-    doc.text('Fecha de Vto. de CAE: ', 166, 273, 'right');
-    doc.text(cae_fec_vto, 168, 273, 'left');
     //PDF
     doc.save('Test.pdf');
   }

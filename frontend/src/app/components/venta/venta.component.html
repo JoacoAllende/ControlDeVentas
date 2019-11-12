@@ -55,7 +55,7 @@
             <button class="btn btn-default" (click)="habilitarInicial()">Cancelar venta</button>
         </div>
     </div>
-    <div *ngIf="detallesVenta.length > 0">
+    <div *ngIf="detallesVenta.length > 0 && !factura">
         <table class="table" id="productoTable">
             <thead class="text-center">
                 <th>Código</th>
