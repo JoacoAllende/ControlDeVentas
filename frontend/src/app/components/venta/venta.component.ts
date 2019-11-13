@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { DetalleVenta } from 'src/app/models/detalle-venta';
 import { VentaService } from '../../services/venta.service';
 import { Producto } from 'src/app/models/producto';
@@ -46,7 +46,7 @@ export class VentaComponent implements OnInit {
     { name: 'CUIT', value: 80 },
     { name: 'CUIL', value: 86 },
     { name: 'DNI', value: 96 },
-    { name: 'Doc. (Otro)', value: 99}
+    { name: 'Doc. (Otro)', value: 99 }
   ];
   docTipoSelected;
   docNroSelected;
@@ -68,9 +68,9 @@ export class VentaComponent implements OnInit {
     const dia = hoy.getDate();
     let fecha;
     if (dia.toString().length == 1) {
-      fecha =  año + '-' + mes + '-0' + dia;
+      fecha = año + '-' + mes + '-0' + dia;
     } else {
-      fecha =  año + '-' + mes + '-' + dia;
+      fecha = año + '-' + mes + '-' + dia;
     }
     this.fecha = fecha;
     this.cambiarFecha(fecha);
@@ -146,11 +146,11 @@ export class VentaComponent implements OnInit {
     }
   }
 
-  modificarVenta(id_cliente){
+  modificarVenta(id_cliente) {
     if (id_cliente != '') {
       if (confirm('Desea modificar el cliente de la venta?')) {
         const venta = new Venta(this.id_venta, id_cliente, null, null);
-        this.ventaService.putVentaCliente(this.id_venta,venta)
+        this.ventaService.putVentaCliente(this.id_venta, venta)
           .subscribe(res => {
             this.resumenVentasObservable.subscribe(vent => this.resumenVentas = vent);
             this.edicion = false;
@@ -164,7 +164,7 @@ export class VentaComponent implements OnInit {
     }
   }
 
-  cancelarModificarVenta(){
+  cancelarModificarVenta() {
     this.edicion = false;
     this.busquedaNombre = '';
   }
@@ -219,9 +219,9 @@ export class VentaComponent implements OnInit {
       this.factura = true;
       this.clienteSelected = id_cliente;
       this.ventaService.getDetalles(id_venta)
-      .subscribe(res => {
-        this.id_venta = id_venta;
-      })
+        .subscribe(res => {
+          this.id_venta = id_venta;
+        })
     } else {
       alert('La venta ya ha sido facturada');
       this.factura = false;
@@ -232,10 +232,27 @@ export class VentaComponent implements OnInit {
   facturar(form: NgForm) {
     if (confirm('Desea realizar la factura?')) {
       let tot = form.value.impTotal;
+      this.cbteTipoSelected = form.value.cbteTipoSelected;
+      console.log(this.cbteTipoSelected);
       const facturaAfip = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal);
-      this.ventaService.postFacturaAfip(facturaAfip)
-      .subscribe(res => {
-          const today = new Date();
+      if (this.cbteTipoSelected == 6) {
+        this.ventaService.postFacturaAfipB(facturaAfip)
+          .subscribe(res => {
+            this.continuarFactura(res, tot);
+          })
+      } else if (this.cbteTipoSelected == 11) {
+        this.ventaService.postFacturaAfipC(facturaAfip)
+          .subscribe(res => {
+            this.continuarFactura(res, tot);
+          })
+      }
+      this.habilitarInicial();
+    }
+
+  }
+
+  continuarFactura(res, tot) {
+    const today = new Date();
           const fecha = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
           const fechaEmisionPDF = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
           const nroComprobante = res['voucherNumber'];
@@ -249,7 +266,7 @@ export class VentaComponent implements OnInit {
               this.ventaService.getDetalles(this.id_venta)
               .subscribe(res => {
                 this.detallesVenta = res as DetalleVenta[];
-                this.facturaPdf(this.cbteTipos.find(o => o.value === this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
+                this.facturaPdf(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
                                 this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
                 this.factura = false;
                 this.edicion = false;
@@ -258,10 +275,7 @@ export class VentaComponent implements OnInit {
             })
           })
           
-        })
-      this.habilitarInicial();
-    }
-
+        
   }
 
   editVenta(venta) {
@@ -311,9 +325,9 @@ export class VentaComponent implements OnInit {
     let array;
     for (let index = 0; index <= cantHojas; index++) {
       if (index < cantHojas) {
-        array = detallesVenta.slice(index * 28, index * 28 + 27);  
+        array = detallesVenta.slice(index * 28, index * 28 + 27);
       } else {
-        array = detallesVenta.slice(index * 28, detallesVenta.length);  
+        array = detallesVenta.slice(index * 28, detallesVenta.length);
       }
       //ORIGINAL
       doc.rect(10, 6, doc.internal.pageSize.width - 20, 10, 'S');
@@ -345,14 +359,14 @@ export class VentaComponent implements OnInit {
       doc.setFontSize(11);
       let nroComp = '';
       for (let index = 0; index < (8 - nroComprobante.toString().length); index++) {
-         nroComp += '0'
+        nroComp += '0'
       }
       nroComp += nroComprobante;
-      doc.text('Punto de Venta: 00001    Comp. Nro: ' + nroComp,(doc.internal.pageSize.width / 2) + 5, 35, 'left');
-      doc.text('Fecha de Emisión:  ' + fechaEmision,(doc.internal.pageSize.width / 2) + 5, 42, 'left');
-      doc.text('CUIT:  20379855068',(doc.internal.pageSize.width / 2) + 5, 52, 'left');
-      doc.text('Ingresos Brutos:  2037985506',(doc.internal.pageSize.width / 2) + 5, 59, 'left');
-      doc.text('Fecha de Inicio de Actividades:  01/12/2018',(doc.internal.pageSize.width / 2) + 5, 66, 'left');
+      doc.text('Punto de Venta: 00001    Comp. Nro: ' + nroComp, (doc.internal.pageSize.width / 2) + 5, 35, 'left');
+      doc.text('Fecha de Emisión:  ' + fechaEmision, (doc.internal.pageSize.width / 2) + 5, 42, 'left');
+      doc.text('CUIT:  20379855068', (doc.internal.pageSize.width / 2) + 5, 52, 'left');
+      doc.text('Ingresos Brutos:  2037985506', (doc.internal.pageSize.width / 2) + 5, 59, 'left');
+      doc.text('Fecha de Inicio de Actividades:  01/12/2018', (doc.internal.pageSize.width / 2) + 5, 66, 'left');
       //SEGUNDO RECTANGULO
       let documentoCompleto = tipoDocumento + ': ' + nroDocumento;
       doc.rect(10, 78, doc.internal.pageSize.width - 20, 11, 'S');
@@ -361,7 +375,7 @@ export class VentaComponent implements OnInit {
       //TITULOS DETALLES
       doc.setFontSize(9);
       doc.setDrawColor(0);
-      doc.setFillColor(169,169,169);
+      doc.setFillColor(169, 169, 169);
       doc.rect(10, 91, doc.internal.pageSize.width - 20, 10, 'FD');
       doc.text('Descripción', 20, 96, 'left');
       doc.text('Cantidad', 85, 96, 'left');
@@ -375,7 +389,7 @@ export class VentaComponent implements OnInit {
       let altura = 108;
       array.forEach(element => {
         if (element.descripcion.length > 50)
-          element.descripcion = element.descripcion.substring(0,49);
+          element.descripcion = element.descripcion.substring(0, 49);
         doc.text(element.descripcion, 10, altura, 'left');
         doc.text(element.cantidad.toString(), 100, altura, 'right');
         doc.text('unidades', 115, altura, 'center');

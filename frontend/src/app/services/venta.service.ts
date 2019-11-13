@@ -37,8 +37,12 @@ export class VentaService {
     return this.http.get<DetalleVenta[]>(`http://localhost:3000/detalles/` + id_venta);
   }
 
-  postFacturaAfip(factura : FacturaAfip){
-    return this.http.post(`http://localhost:3000/facturacionAfip/`, factura);
+  postFacturaAfipC(factura : FacturaAfip){
+    return this.http.post(`http://localhost:3000/facturacionAfipC/`, factura);
+  }
+
+  postFacturaAfipB(factura : FacturaAfip){
+    return this.http.post(`http://localhost:3000/facturacionAfipB/`, factura);
   }
 
   postFacturaLocal(factura : FacturaLocal){
