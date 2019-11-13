@@ -14,7 +14,7 @@
                 <th>Facturar</th>
             </thead>
             <tbody>
-                <tr *ngFor="let venta of resumenVentas | paginate: { itemsPerPage: 8, currentPage: actualPageVentas }">
+                <tr *ngFor="let venta of resumenVentas | paginate: { id: 'paginationVentas', itemsPerPage: 8, currentPage: actualPageVentas }">
                     <td>{{venta.cliente}}</td>
                     <td>{{venta.total | number : '1.2-2'}}</td>
                     <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
@@ -26,7 +26,7 @@
                 </tr>
             </tbody>
         </table>
-        <pagination-controls (pageChange)="actualPageVentas = $event"></pagination-controls>
+        <pagination-controls id="paginationVentas" (pageChange)="actualPageVentas = $event"></pagination-controls>
         <button class="btn btn-default" (click)="habilitarInicial()">Salir</button>
         <div class="espacio"></div>
     </div>
@@ -65,7 +65,7 @@
             </thead>
             <tbody>
                 <tr
-                    *ngFor="let detalle of detallesVenta | paginate: { itemsPerPage: 8, currentPage: actualPageDetalles }">
+                    *ngFor="let detalle of detallesVenta | paginate: { id: 'paginationDetalles', itemsPerPage: 8, currentPage: actualPageDetalles }">
                     <td>{{detalle.codigo}}</td>
                     <td>{{detalle.descripcion}}</td>
                     <td>{{detalle.cantidad}}</td>
@@ -82,7 +82,7 @@
                 </tr>
             </tfoot>
         </table>
-        <pagination-controls (pageChange)="actualPageDetalles = $event"></pagination-controls>
+        <pagination-controls id="paginationDetalles" (pageChange)="actualPageDetalles = $event"></pagination-controls>
         <button type="submit" class="btn btn-default pull-right" (click)="finalizarVenta()" *ngIf="venta">Finalizar
             venta</button>
         <button type="submit" class="btn btn-default" (click)="cancelar()">Cancelar detalles</button>
