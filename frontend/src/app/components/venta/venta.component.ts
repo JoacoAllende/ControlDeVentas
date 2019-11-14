@@ -325,7 +325,7 @@ export class VentaComponent implements OnInit {
     let array;
     for (let index = 0; index <= cantHojas; index++) {
       if (index < cantHojas) {
-        array = detallesVenta.slice(index * 28, index * 28 + 27);
+        array = detallesVenta.slice(index * 28, index * 28 + 28);
       } else {
         array = detallesVenta.slice(index * 28, detallesVenta.length);
       }
