@@ -60,7 +60,7 @@
         </div>
         <button type="submit" class="btn btn-default" (click)="CheckValidation(clienteForm)">Enviar</button>
         <button type="submit" class="btn btn-default" (click)="resetForm(clienteForm)">Limpiar</button>
-        <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial()">Salir</button>
+        <button type="submit" class="btn btn-default pull-right" (click)="habilitarInicial(clienteForm)">Salir</button>
     </form>
     <button type="submit" class="btn btn-default pull-right" (click)="habilitarEdicion()"
         *ngIf="inicial">Editar</button>
