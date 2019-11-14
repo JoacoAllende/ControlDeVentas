@@ -6,8 +6,8 @@
                 <thead class="text-center">
                     <th>Cliente</th>
                     <th>Tipo documento</th>
-                    <th>Nro. documento</th>
-                    <th>Telefono</th>
+                    <th class="numero">Nro. documento</th>
+                    <th class="numero">Teléfono</th>
                     <th *ngIf="edicion">Editar</th>
                     <th *ngIf="edicion">Eliminar</th>
                 </thead>
@@ -16,8 +16,8 @@
                         *ngFor="let cliente of clientes | paginate: { itemsPerPage: 10, currentPage: actualPageClientes }">
                         <td>{{cliente.nombre}}</td>
                         <td>{{cliente.descripcion}}</td>
-                        <td>{{cliente.doc_nro}}</td>
-                        <td>{{cliente.telefono}}</td>
+                        <td class="numero">{{cliente.doc_nro}}</td>
+                        <td class="numero">{{cliente.telefono}}</td>
                         <td><a (click)="editCliente(cliente)" *ngIf="edicion">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a></td>

@@ -8,21 +8,26 @@
         <table class="table" id="productoTable" *ngIf="resumenVentas.length > 0">
             <thead class="text-center">
                 <th>Cliente</th>
-                <th>Total</th>
-                <th>Detalles</th>
-                <th>Modificar</th>
-                <th>Facturar</th>
+                <th class="numero">Total</th>
+                <th class="numero">Detalles</th>
+                <th class="numero">Modificar</th>
+                <th class="numero">Facturar</th>
             </thead>
             <tbody>
-                <tr *ngFor="let venta of resumenVentas | paginate: { id: 'paginationVentas', itemsPerPage: 8, currentPage: actualPageVentas }">
+                <tr
+                    *ngFor="let venta of resumenVentas | paginate: { id: 'paginationVentas', itemsPerPage: 8, currentPage: actualPageVentas }">
                     <td>{{venta.cliente}}</td>
-                    <td>{{venta.total | number : '1.2-2'}}</td>
-                    <td (click)="getDetalles(venta.id)" class="glyphicon glyphicon-zoom-in"></td>
-                    <td><a (click)="editVenta(venta)">
+                    <td class="numero">{{venta.total | number : '1.2-2'}}</td>
+                    <td class="numero"><a (click)="getDetalles(venta.id)">
+                            <i class="glyphicon glyphicon-zoom-in"></i>
+                        </a></td>
+                    <td class="numero"><a (click)="editVenta(venta)">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a></td>
-                    <td (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado, venta.cliente, venta.id_cliente)"
-                        class="glyphicon glyphicon-folder-close"></td>
+                    <td class="numero"><a
+                            (click)="comenzarFactura(venta.id, venta.total, venta.doc_tipo, venta.doc_nro, venta.facturado, venta.cliente, venta.id_cliente)">
+                            <i class="glyphicon glyphicon-folder-close numero"></i>
+                        </a></td>
                 </tr>
             </tbody>
         </table>
@@ -36,12 +41,15 @@
         <div class="espacio"></div>
         <div class="select">
             <select [(ngModel)]="clienteSelected" #clienteSelect name="clienteSelected" required>
-                <option *ngFor="let cliente of clientes | nombreFilter:busquedaNombre" [value]="cliente.id">{{cliente.nombre}}</option>
+                <option *ngFor="let cliente of clientes | nombreFilter:busquedaNombre" [value]="cliente.id">
+                    {{cliente.nombre}}</option>
             </select>
         </div>
         <div class="espacio"></div>
-        <button type="submit" *ngIf="edicion" class="btn btn-default" (click)="cancelarModificarVenta()">Cancelar</button>
-        <button type="submit" *ngIf="edicion" class="btn btn-default" (click)="modificarVenta(clienteSelect.value)">Modificar</button>
+        <button type="submit" *ngIf="edicion" class="btn btn-default"
+            (click)="cancelarModificarVenta()">Cancelar</button>
+        <button type="submit" *ngIf="edicion" class="btn btn-default"
+            (click)="modificarVenta(clienteSelect.value)">Modificar</button>
         <div *ngIf="venta" class="espacio"></div>
         <div *ngIf="venta" class="col-md-6 form-group">
             <input (keydown)="onKeydown($event)" type="number" placeholder="Código" [(ngModel)]="codigo"
@@ -60,16 +68,16 @@
             <thead class="text-center">
                 <th>Código</th>
                 <th>Descripción</th>
-                <th>Cantidad</th>
-                <th>Total</th>
+                <th class="numero">Cantidad</th>
+                <th class="numero">Total</th>
             </thead>
             <tbody>
                 <tr
                     *ngFor="let detalle of detallesVenta | paginate: { id: 'paginationDetalles', itemsPerPage: 8, currentPage: actualPageDetalles }">
                     <td>{{detalle.codigo}}</td>
                     <td>{{detalle.descripcion}}</td>
-                    <td>{{detalle.cantidad}}</td>
-                    <td>{{detalle.precio_detalle | number : '1.2-2'}}</td>
+                    <td class="numero">{{detalle.cantidad}}</td>
+                    <td class="numero">{{detalle.precio_detalle | number : '1.2-2'}}</td>
                     <td *ngIf="venta"><a (click)="deleteDetalle(detalle)">
                             <i class="glyphicon glyphicon-remove"></i>
                         </a></td>
@@ -78,7 +86,7 @@
             <tfoot>
                 <tr>
                     <td colspan=3>Total</td>
-                    <td>{{total | number : '1.2-2'}}</td>
+                    <td class="numero">{{total | number : '1.2-2'}}</td>
                 </tr>
             </tfoot>
         </table>

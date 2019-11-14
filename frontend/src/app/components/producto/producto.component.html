@@ -14,16 +14,16 @@
             <thead class="text-center">
                 <th (click)="setOrder('codigo')" class="pointer">Código</th>
                 <th (click)="setOrder('descripcion')" class="pointer">Descripción</th>
-                <th (click)="setOrder('precio')" class="pointer">Precio</th>
+                <th (click)="setOrder('precio')" class="pointer numero">Precio</th>
                 <th *ngIf="edicion">Editar</th>
                 <th *ngIf="edicion">Eliminar</th>
             </thead>
             <tbody>
                 <tr
                     *ngFor="let producto of productos | orderBy: order:reverse:'case-insensitive' | codigoFilter:busquedaCodigo | descripcionFilter:busquedaDescripcion | paginate: { itemsPerPage: 10, currentPage: actualPage}">
-                    <td>{{producto.codigo}}</td>
+                    <td >{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
-                    <td>{{producto.precio  | number : '1.2-2'}}</td>
+                    <td class="numero">{{producto.precio  | number : '1.2-2'}}</td>
                     <td><a (click)="editProducto(producto)" *ngIf="edicion">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a></td>

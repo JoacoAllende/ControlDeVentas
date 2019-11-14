@@ -4,3 +4,7 @@
 .pointer{
     cursor:pointer;
 }
+
+.numero {
+    text-align: right;
+}
