@@ -12,7 +12,7 @@ CREATE TABLE cliente (
     id INT(4) AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     doc_tipo INT(2) NOT NULL,
-    doc_nro BIGINT(14) NOT NULL,
+    doc_nro BIGINT(14) NOT NULL UNIQUE,
     telefono VARCHAR(18) NULL,
     FOREIGN KEY(doc_tipo) REFERENCES doc_tipo(id)
 );

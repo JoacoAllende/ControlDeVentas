@@ -3,8 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Producto } from '../models/producto';
 import { Venta } from '../models/venta';
 import { DetalleVenta } from '../models/detalle-venta';
-import { FacturaAfip } from '../models/facturaAfip';
-import { FacturaLocal } from '../models/facturaLocal';
 import { GlobalService } from './global.service';
 
 @Injectable({

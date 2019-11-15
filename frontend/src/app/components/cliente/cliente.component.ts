@@ -124,7 +124,7 @@ export class ClienteComponent implements OnInit {
         .subscribe(res => {
           this.resetForm(form);
           if (res == 1062) {
-            alert('No pudo crearse el producto. Ya existía un producto con el código ingresado.')
+            alert('No pudo crearse el cliente. Ya existía un cliente con el nro. de documento ingresado.')
           } else {
             this.clientesObs.subscribe(cl => this.clientes = cl);
           }
@@ -135,7 +135,7 @@ export class ClienteComponent implements OnInit {
         .subscribe(res => {
           this.resetForm(form);
           if (res == 1062) {
-            alert('No pudo actualizarse el producto. Ya existía un producto con el código ingresado.')
+            alert('No pudo modificarse el cliente. Ya existía un cliente con el nro. de documento ingresado.')
           } else {
             this.clientesObs.subscribe(cl => this.clientes = cl);
           }
