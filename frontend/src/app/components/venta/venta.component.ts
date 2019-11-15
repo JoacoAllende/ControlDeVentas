@@ -10,6 +10,8 @@ import { NgForm } from '@angular/forms';
 import { FacturaLocal } from 'src/app/models/facturaLocal';
 import { Cliente } from 'src/app/models/cliente';
 import { ClienteService } from 'src/app/services/cliente.service';
+import { FacturaService } from 'src/app/services/factura.service';
+import { ProductoService } from 'src/app/services/producto.service';
 
 @Component({
   selector: 'app-venta',
@@ -59,7 +61,7 @@ export class VentaComponent implements OnInit {
   //FILTRO PIPE
   busquedaNombre: string;
 
-  constructor(private ventaService: VentaService, private clienteService: ClienteService) { }
+  constructor(private ventaService: VentaService, private clienteService: ClienteService, private facturaService: FacturaService, private productoService: ProductoService) { }
 
   ngOnInit() {
     const hoy = new Date();
@@ -74,7 +76,7 @@ export class VentaComponent implements OnInit {
     }
     this.fecha = fecha;
     this.cambiarFecha(fecha);
-    this.detallesVentaObservable = this.ventaService.getDetalles(this.id_venta);
+    this.detallesVentaObservable = this.ventaService.getVentaDetalles(this.id_venta);
     this.detallesVentaObservable.subscribe(det => this.detallesVenta = det);
     this.clientesObs = this.clienteService.getAllClientes();
     this.clientesObs.subscribe(cl => this.clientes = cl);
@@ -95,7 +97,7 @@ export class VentaComponent implements OnInit {
       } else if (!Number.isInteger(cantidad)) {
         alert('La cantidad del producto debe ser un número entero');
       } else {
-        this.ventaService.getProducto(codigo)
+        this.productoService.getProducto(codigo)
           .subscribe(res => {
             if ((<any>res).length > 0) {
               this.ventaService.selectedProducto = res as Producto;
@@ -193,7 +195,7 @@ export class VentaComponent implements OnInit {
     this.total = 0;
     this.factura = false;
     this.edicion = false;
-    this.ventaService.getDetalles(id_venta)
+    this.ventaService.getVentaDetalles(id_venta)
       .subscribe(res => {
         this.id_venta = id_venta;
         this.detallesVenta = res as DetalleVenta[];
@@ -218,7 +220,7 @@ export class VentaComponent implements OnInit {
       this.razonSocialSelected = razonSocial;
       this.factura = true;
       this.clienteSelected = id_cliente;
-      this.ventaService.getDetalles(id_venta)
+      this.ventaService.getVentaDetalles(id_venta)
         .subscribe(res => {
           this.id_venta = id_venta;
         })
@@ -236,12 +238,12 @@ export class VentaComponent implements OnInit {
       console.log(this.cbteTipoSelected);
       const facturaAfip = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal);
       if (this.cbteTipoSelected == 6) {
-        this.ventaService.postFacturaAfipB(facturaAfip)
+        this.facturaService.postFacturaAfipB(facturaAfip)
           .subscribe(res => {
             this.continuarFactura(res, tot);
           })
       } else if (this.cbteTipoSelected == 11) {
-        this.ventaService.postFacturaAfipC(facturaAfip)
+        this.facturaService.postFacturaAfipC(facturaAfip)
           .subscribe(res => {
             this.continuarFactura(res, tot);
           })
@@ -253,29 +255,29 @@ export class VentaComponent implements OnInit {
 
   continuarFactura(res, tot) {
     const today = new Date();
-          const fecha = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-          const fechaEmisionPDF = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
-          const nroComprobante = res['voucherNumber'];
-          let nro_cae = res['CAE'];
-          let cae_fec_vto = res['CAEFchVto'];
-          const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, this.cbteTipoSelected, 1, nroComprobante, this.clienteSelected, tot);
-          this.ventaService.postFacturaLocal(facturaLocal)
+    const fecha = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    const fechaEmisionPDF = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+    const nroComprobante = res['voucherNumber'];
+    let nro_cae = res['CAE'];
+    let cae_fec_vto = res['CAEFchVto'];
+    const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, this.cbteTipoSelected, 1, nroComprobante, this.clienteSelected, tot);
+    this.facturaService.postFacturaLocal(facturaLocal)
+      .subscribe(res => {
+        this.ventaService.putVenta(this.id_venta)
           .subscribe(res => {
-            this.ventaService.putVenta(this.id_venta)
-            .subscribe(res => {
-              this.ventaService.getDetalles(this.id_venta)
+            this.ventaService.getVentaDetalles(this.id_venta)
               .subscribe(res => {
                 this.detallesVenta = res as DetalleVenta[];
                 this.facturaPdf(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
-                                this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                  this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
                 this.factura = false;
                 this.edicion = false;
                 this.detallesVenta = [];
               })
-            })
           })
-          
-        
+      })
+
+
   }
 
   editVenta(venta) {

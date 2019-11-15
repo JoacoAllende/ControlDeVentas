@@ -34,4 +34,8 @@ export class ProductoService {
      return this.http.delete(`http://${this.API_URI}/productos/` + id);
    }
 
+   getProducto(codigo : number){
+    return this.http.get(`http://${this.API_URI}/productos/` + codigo);
+  }
+
 }

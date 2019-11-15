@@ -24,10 +24,6 @@ export class VentaService {
     this.API_URI = globalService.API_URI;
   }
 
-  getProducto(codigo : number){
-    return this.http.get(`http://${this.API_URI}/productos/` + codigo);
-  }
-
   postVenta(venta : Venta){
     return this.http.post(`http://${this.API_URI}/ventas`,venta);
   }
@@ -36,20 +32,8 @@ export class VentaService {
     return this.http.get<Venta[]>(`http://${this.API_URI}/ventas/` + fecha);
   }
 
-  getDetalles(id_venta : number){
-    return this.http.get<DetalleVenta[]>(`http://${this.API_URI}/detalles/` + id_venta);
-  }
-
-  postFacturaAfipC(factura : FacturaAfip){
-    return this.http.post(`http://${this.API_URI}/facturacionAfipC/`, factura);
-  }
-
-  postFacturaAfipB(factura : FacturaAfip){
-    return this.http.post(`http://${this.API_URI}/facturacionAfipB/`, factura);
-  }
-
-  postFacturaLocal(factura : FacturaLocal){
-    return this.http.post(`http://${this.API_URI}/facturacionLocal/`, factura);
+  getVentaDetalles(id_venta : number){
+    return this.http.get<DetalleVenta[]>(`http://${this.API_URI}/ventas/detalles/` + id_venta);
   }
 
   putVenta(id_venta : number){
