@@ -8,6 +8,11 @@ CREATE TABLE doc_tipo (
     descripcion VARCHAR(12) NOT NULL
 );
 
+CREATE TABLE alicuota (
+    id INT PRIMARY KEY,
+    valor NUMERIC (3,1) NOT NULL
+);
+
 CREATE TABLE cliente (
     id INT(4) AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
@@ -21,7 +26,9 @@ CREATE TABLE producto (
     id INT(4) AUTO_INCREMENT PRIMARY KEY,
     codigo VARCHAR(12) UNIQUE,
     descripcion VARCHAR(80) NOT NULL,
-    precio NUMERIC(7,2) NOT NULL
+    precio NUMERIC(7,2) NOT NULL,
+    id_alicuota INT(1) NOT NULL,
+    FOREIGN KEY(id_alicuota) REFERENCES alicuota(id)
 );
 
 CREATE TABLE venta (

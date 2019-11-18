@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Producto } from '../models/producto';
 import { HttpClient } from '@angular/common/http';
 import { GlobalService } from './global.service';
+import { Alicuota } from '../models/alicuota';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class ProductoService {
 
   constructor(private http : HttpClient, private globalService : GlobalService) {
     this.productos = [];
-    this.selectedProducto = new Producto(null,"","",null);
+    this.selectedProducto = new Producto(null,"","",null, 5);
     this.API_URI = globalService.API_URI;
    }
 
@@ -37,5 +38,9 @@ export class ProductoService {
    getProducto(codigo : number){
     return this.http.get(`http://${this.API_URI}/productos/` + codigo);
   }
+
+  getProductosAlicuotas(){
+    return this.http.get<Alicuota[]>(`http://${this.API_URI}/productos-alicuotas`);
+   }
 
 }

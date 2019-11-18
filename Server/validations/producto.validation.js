@@ -39,4 +39,8 @@ prodValidator.validar_updateProducto = (req, res) => {
         res.json('error');
 }
 
+prodValidator.validar_getProductosAlicuotas = (req, res) => {
+    prodController.getProductosAlicuotas(req, res);
+}
+
 module.exports = prodValidator;

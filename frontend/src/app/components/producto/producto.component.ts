@@ -3,6 +3,7 @@ import { ProductoService } from '../../services/producto.service';
 import { NgForm } from '@angular/forms';
 import { Producto } from 'src/app/models/producto';
 import { Observable } from 'rxjs';
+import { Alicuota } from 'src/app/models/alicuota';
 
 @Component({
   selector: 'app-producto',
@@ -26,12 +27,17 @@ export class ProductoComponent implements OnInit {
   //FILTRO PIPE
   busquedaCodigo: string;
   busquedaDescripcion: string;
+  //ALÍCUOTAS
+  public alicuotasDisponiblesObs: Observable<Alicuota[]>;
+  public alicuotasDisponibles: Alicuota[];
 
   constructor(private productoService : ProductoService) { }
 
   ngOnInit() {
     this.productosObs = this.productoService.getProductos();
     this.productosObs.subscribe(prod => this.productos = prod);
+    this.alicuotasDisponiblesObs = this.productoService.getProductosAlicuotas();
+    this.alicuotasDisponiblesObs.subscribe(alic => this.alicuotasDisponibles = alic);
   }
 
   // DISTINTOS ÓRDENES
@@ -53,7 +59,7 @@ export class ProductoComponent implements OnInit {
   }
 
   editProducto(producto: Producto){
-    this.productoService.selectedProducto = new Producto(producto.id, producto.descripcion, producto.codigo, producto.precio);
+    this.productoService.selectedProducto = new Producto(producto.id, producto.descripcion, producto.codigo, producto.precio, producto.id_alicuota);
   }
 
   addProducto(form : NgForm){

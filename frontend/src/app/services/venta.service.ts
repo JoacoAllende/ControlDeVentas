@@ -16,7 +16,7 @@ export class VentaService {
   API_URI;
 
   constructor(private http : HttpClient, private globalService : GlobalService) { 
-    this.selectedProducto = new Producto(null,"","",null);
+    this.selectedProducto = new Producto(null,"","",null, null);
     this.selectedVenta = [];
     this.ventas = [];
     this.API_URI = globalService.API_URI;

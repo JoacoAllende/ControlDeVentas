@@ -15,8 +15,9 @@
                 <th (click)="setOrder('codigo')" class="pointer">Código</th>
                 <th (click)="setOrder('descripcion')" class="pointer">Descripción</th>
                 <th (click)="setOrder('precio')" class="pointer numero">Precio</th>
-                <th *ngIf="edicion">Editar</th>
-                <th *ngIf="edicion">Eliminar</th>
+                <th class="numero">Alícuota</th>
+                <th class="numero" *ngIf="edicion">Editar</th>
+                <th class="numero" *ngIf="edicion">Eliminar</th>
             </thead>
             <tbody>
                 <tr
@@ -24,10 +25,11 @@
                     <td >{{producto.codigo}}</td>
                     <td>{{producto.descripcion}}</td>
                     <td class="numero">{{producto.precio  | number : '1.2-2'}}</td>
-                    <td><a (click)="editProducto(producto)" *ngIf="edicion">
+                    <td class="numero">{{producto.alicuota  | number : '1.1-1'}}%</td>
+                    <td class="numero"><a (click)="editProducto(producto)" *ngIf="edicion">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a></td>
-                    <td><a (click)="deleteProducto(producto.id)" *ngIf="edicion">
+                    <td class="numero"><a (click)="deleteProducto(producto.id)" *ngIf="edicion">
                             <i class="glyphicon glyphicon-remove"></i>
                         </a></td>
                 </tr>
@@ -52,6 +54,14 @@
             <label for="Precio">Precio</label>
             <input type="number" class="form-control" name="precio"
                 [(ngModel)]="productoService.selectedProducto.precio" #precio="ngModel" required placeholder="Precio">
+        </div>
+        <div class="form-group">
+            <label for="tipoAlicuota">Alícuota</label>
+            <div class="select">
+                <select [(ngModel)]="productoService.selectedProducto.id_alicuota" name="alicuotaSelected" required>
+                    <option *ngFor="let alicuota of alicuotasDisponibles" [value]="alicuota.id">{{alicuota.valor  | number : '1.1-1'}}%</option>
+                </select>
+            </div>
         </div>
         <button type="submit" class="btn btn-default" (click)="CheckValidation(productoForm)">Enviar</button>
         <button type="submit" class="btn btn-default" (click)="resetForm(productoForm)">Limpiar</button>
