@@ -1,3 +1,8 @@
+DROP DATABASE IF EXISTS controlVentas;
+CREATE DATABASE controlVentas;
+
+USE controlVentas
+
 CREATE TABLE cbte_tipo (
     id INT(3) PRIMARY KEY,
     descripcion VARCHAR(10) NOT NULL
@@ -24,7 +29,7 @@ CREATE TABLE cliente (
 
 CREATE TABLE producto (
     id INT(4) AUTO_INCREMENT PRIMARY KEY,
-    codigo VARCHAR(12) UNIQUE,
+    codigo BIGINT(13) UNIQUE,
     descripcion VARCHAR(80) NOT NULL,
     precio NUMERIC(7,2) NOT NULL,
     id_alicuota INT(1) NOT NULL,

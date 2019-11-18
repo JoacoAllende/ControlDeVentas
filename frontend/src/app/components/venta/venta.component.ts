@@ -89,8 +89,6 @@ export class VentaComponent implements OnInit {
       cantidad = 1;
     if (codigo == null) {
       alert('Debe ingresarse un código');
-    } else if (codigo.toString().length != 12) {
-      alert('La longitud del código debe ser de 12')
     } else {
       if (cantidad <= 0) {
         alert('La cantidad del producto debe ser mayor a 0');
