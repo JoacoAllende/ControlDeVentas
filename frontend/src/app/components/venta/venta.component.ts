@@ -12,6 +12,7 @@ import { Cliente } from 'src/app/models/cliente';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { FacturaService } from 'src/app/services/factura.service';
 import { ProductoService } from 'src/app/services/producto.service';
+import { AlicuotasIva } from 'src/app/models/alicuotas-iva';
 
 @Component({
   selector: 'app-venta',
@@ -102,12 +103,12 @@ export class VentaComponent implements OnInit {
               const producto = this.ventaService.selectedProducto[0];
               const detalle = this.detallesVenta.filter(det => (det.codigo == producto.codigo));
               if (detalle.length == 0)
-                this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
+                this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad, null, null));
               else {
                 this.detallesVenta = this.detallesVenta.filter(det => (det.codigo != producto.codigo));
                 cantidad += detalle[0].cantidad;
                 this.total -= detalle[0].precio_detalle;
-                this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad));
+                this.detallesVenta.push(new DetalleVenta(producto.id, producto.codigo, producto.descripcion, cantidad, producto.precio * cantidad, null, null));
               }
               this.total += producto.precio * cantidad;
             } else {
@@ -220,6 +221,7 @@ export class VentaComponent implements OnInit {
       this.clienteSelected = id_cliente;
       this.ventaService.getVentaDetalles(id_venta)
         .subscribe(res => {
+          this.detallesVenta = res as DetalleVenta[];
           this.id_venta = id_venta;
         })
     } else {
@@ -233,15 +235,32 @@ export class VentaComponent implements OnInit {
     if (confirm('Desea realizar la factura?')) {
       let tot = form.value.impTotal;
       this.cbteTipoSelected = form.value.cbteTipoSelected;
-      console.log(this.cbteTipoSelected);
-      const facturaAfip = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal);
       if (this.cbteTipoSelected == 6) {
-        this.facturaService.postFacturaAfipB(facturaAfip)
+        let alicuotasIva = new AlicuotasIva();
+        let impNeto = 0;
+        let impIva = 0;
+        this.detallesVenta.forEach(element => {
+          const coeficiente = (1 + element.alicuota / 100)
+          const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
+          const importe = Number((element.precio_detalle - baseImp).toFixed(2));
+          const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
+          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe; 
+          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp,importe + oldImporte);
+          impIva += importe;
+          impNeto += baseImp;
+        });
+        const newAlicuotasIva = alicuotasIva.Iva.filter(o => o.BaseImp !== 0);
+        impIva = Number(impIva.toFixed(2));
+        impNeto = Number(impNeto.toFixed(2));
+        const impTotal = Number((impIva + impNeto).toFixed(2));
+        const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
+        this.facturaService.postFacturaAfipB(facturaAfipB)
           .subscribe(res => {
             this.continuarFactura(res, tot);
           })
       } else if (this.cbteTipoSelected == 11) {
-        this.facturaService.postFacturaAfipC(facturaAfip)
+        const facturaAfipC = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal, null, null);
+        this.facturaService.postFacturaAfipC(facturaAfipC)
           .subscribe(res => {
             this.continuarFactura(res, tot);
           })

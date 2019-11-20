@@ -41,8 +41,9 @@ facturaCtrl.createFacturaAfipB = async (req, res) => {
     const docNro = factura.docNro;
     const cbteTipo = factura.cbteTipo;
     const impTotal = factura.impTotal;
-    const impNeto = (impTotal / 1.21).toFixed(2);
-    const ImpIVA = (impTotal - impNeto).toFixed(2);
+    const impNeto = factura.impNeto;
+    const impIva = factura.impIva;
+    const iva = factura.alicuotasIva;
     const fecha = new Date(Date.now() - ((new Date()).getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     let data = {
         'CantReg': 1,  // Cantidad de comprobantes a registrar
@@ -58,17 +59,11 @@ facturaCtrl.createFacturaAfipB = async (req, res) => {
         'ImpTotConc': 0,   // Importe neto no gravado
         'ImpNeto': impNeto, // Importe neto gravado
         'ImpOpEx': 0,   // Importe exento de IVA
-        'ImpIVA': ImpIVA,  //Importe total de IVA
+        'ImpIVA': impIva,  //Importe total de IVA
         'ImpTrib': 0,   //Importe total de tributos
         'MonId': 'PES', //Tipo de moneda usada en el comprobante (ver tipos disponibles)('PES' para pesos argentinos) 
         'MonCotiz': 1,     // Cotización de la moneda usada (1 para pesos argentinos)  
-        'Iva' 		: [ // (Opcional) Alícuotas asociadas al comprobante
-            {
-                'Id' 		: 5, // Id del tipo de IVA (5 para 21%)(ver tipos disponibles) 
-                'BaseImp' 	: impNeto, // Base imponible
-                'Importe' 	: ImpIVA // Importe 
-            }
-        ],
+        'Iva' 		: iva,
     };
     const resFactura = await afip.ElectronicBilling.createNextVoucher(data);
     res.json(resFactura);

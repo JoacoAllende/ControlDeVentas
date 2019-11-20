@@ -52,7 +52,7 @@ ventaCtrl.getVentasFecha = (req, res) => {
 
 ventaCtrl.getDetallesVenta = (req, res) => {
     const id_venta = req.params.id_venta;
-    const query = 'SELECT p.id, p.codigo, p.descripcion, dv.cantidad, dv.precio_detalle FROM detalle_venta AS dv INNER JOIN producto AS p ON (p.id = dv.id_producto) WHERE dv.id_venta = ' + id_venta + ';'
+    const query = 'SELECT p.id, p.codigo, p.id_alicuota, a.valor AS alicuota, p.descripcion, dv.cantidad, dv.precio_detalle FROM detalle_venta AS dv INNER JOIN producto AS p ON (p.id = dv.id_producto) INNER JOIN alicuota AS a ON (a.id = p.id_alicuota) WHERE dv.id_venta = ' + id_venta + ';'
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
             res.json(rows);
