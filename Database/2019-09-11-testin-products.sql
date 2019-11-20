@@ -29,6 +29,7 @@ INSERT INTO producto (codigo, descripcion, precio, id_alicuota) VALUES
 (7333222443830,'Mostaza Heinz 396 gr.', 219.99, 5),
 (7333224443311,'Mostaza Heinz 200 gr.', 75.8, 5);
 
+INSERT INTO cbte_tipo (id, descripcion) VALUES (1, 'Factura A');
 INSERT INTO cbte_tipo (id, descripcion) VALUES (6, 'Factura B');
 INSERT INTO cbte_tipo (id, descripcion) VALUES (11, 'Factura C');
 

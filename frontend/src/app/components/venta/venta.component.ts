@@ -55,10 +55,11 @@ export class VentaComponent implements OnInit {
   docNroSelected;
   razonSocialSelected;
   cbteTipos: any = [
+    { name: 'Factura A', value: 1 },
     { name: 'Factura B', value: 6 },
     { name: 'Factura C', value: 11 }
   ];
-  cbteTipoSelected = 11;
+  cbteTipoSelected = 1;
   //FILTRO PIPE
   busquedaNombre: string;
 
@@ -258,6 +259,52 @@ export class VentaComponent implements OnInit {
           .subscribe(res => {
             this.continuarFactura(res, tot);
           })
+      } else if (this.cbteTipoSelected == 1) {
+        let alicuotasIva = new AlicuotasIva();
+        let impNeto = 0;
+        let impIva = 0;
+        this.detallesVenta.forEach(element => {
+          const coeficiente = (1 + element.alicuota / 100)
+          const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
+          const importe = Number((element.precio_detalle - baseImp).toFixed(2));
+          const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
+          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe; 
+          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp,importe + oldImporte);
+          impIva += importe;
+          impNeto += baseImp;
+        });
+        const newAlicuotasIva = alicuotasIva.Iva.filter(o => o.BaseImp !== 0);
+        impIva = Number(impIva.toFixed(2));
+        impNeto = Number(impNeto.toFixed(2));
+        const impTotal = Number((impIva + impNeto).toFixed(2));
+        const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
+        this.facturaService.postFacturaAfipB(facturaAfipB)
+          .subscribe(res => {
+            this.continuarFactura(res, tot);
+          })
+      } else if (this.cbteTipoSelected == 11) {
+        let alicuotasIva = new AlicuotasIva();
+        let impNeto = 0;
+        let impIva = 0;
+        this.detallesVenta.forEach(element => {
+          const coeficiente = (1 + element.alicuota / 100)
+          const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
+          const importe = Number((element.precio_detalle - baseImp).toFixed(2));
+          const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
+          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe; 
+          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp,importe + oldImporte);
+          impIva += importe;
+          impNeto += baseImp;
+        });
+        const newAlicuotasIva = alicuotasIva.Iva.filter(o => o.BaseImp !== 0);
+        impIva = Number(impIva.toFixed(2));
+        impNeto = Number(impNeto.toFixed(2));
+        const impTotal = Number((impIva + impNeto).toFixed(2));
+        const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
+        this.facturaService.postFacturaAfipB(facturaAfipB)
+          .subscribe(res => {
+            this.continuarFactura(res, tot);
+          })
       } else if (this.cbteTipoSelected == 11) {
         const facturaAfipC = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal, null, null);
         this.facturaService.postFacturaAfipC(facturaAfipC)
@@ -285,8 +332,13 @@ export class VentaComponent implements OnInit {
             this.ventaService.getVentaDetalles(this.id_venta)
               .subscribe(res => {
                 this.detallesVenta = res as DetalleVenta[];
-                this.facturaPdf(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
-                  this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                if (this.cbteTipoSelected == 1) {
+                  this.facturaPdfA(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
+                    this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                } else {
+                  this.facturaPdf(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
+                    this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                }
                 this.factura = false;
                 this.edicion = false;
                 this.detallesVenta = [];
@@ -336,6 +388,142 @@ export class VentaComponent implements OnInit {
     if (event.key === "Enter") {
       this.addProducto(this.codigo, this.cantidad);
     }
+  }
+
+  facturaPdfA(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto, detallesVenta) {
+    const doc = new jsPDF();
+    const cantHojas = Math.floor(detallesVenta.length / 28);
+    let array;
+    for (let index = 0; index <= cantHojas; index++) {
+      if (index < cantHojas) {
+        array = detallesVenta.slice(index * 28, index * 28 + 28);
+      } else {
+        array = detallesVenta.slice(index * 28, detallesVenta.length);
+      }
+      //ORIGINAL
+      doc.rect(10, 6, doc.internal.pageSize.width - 20, 10, 'S');
+      doc.text('ORIGINAL', doc.internal.pageSize.width / 2, 13.2, 'center');
+      //PRIMER RECTÁNGULO
+      doc.rect(10, 16, doc.internal.pageSize.width - 20, 60, 'S');
+      doc.line(doc.internal.pageSize.width / 2, 30, doc.internal.pageSize.width / 2, 76);
+      //CUADRO TIPO FACTURA
+      doc.rect(doc.internal.pageSize.width / 2 - 7, 16, 14, 14, 'S');
+      doc.setFontSize(24);
+      doc.text(tipoFactura[tipoFactura.length - 1], doc.internal.pageSize.width / 2, 24, 'center');
+      doc.setFontSize(8);
+      let cod = 'COD. ';
+      for (let index = 0; index < (3 - codFactura.toString().length); index++) {
+        cod += '0'
+      }
+      cod += codFactura;
+      doc.text(cod, doc.internal.pageSize.width / 2, 28, 'center');
+      //PRIMER SUBRECTANGULO
+      doc.setFontSize(20);
+      doc.text('ALLENDE JOAQUIN', ((doc.internal.pageSize.width / 2)) / 2, 25, 'center');
+      doc.setFontSize(12);
+      doc.text('Razón Social: Allende Joaquín', 15, 35, 'left');
+      doc.text('Domicilio comercial: Av. Buzón 452 Piso: PB \n Depto. 3 - Tandil, Buenos Aires', 15, 45, 'left');
+      doc.text('Condición frente al IVA: Responsable \n Monotributo', 15, 60, 'left');
+      //SEGUNDO SUBRECTANGULO
+      doc.setFontSize(20);
+      doc.text('FACTURA', (doc.internal.pageSize.width / 2) + 10, 25, 'left');
+      doc.setFontSize(11);
+      let nroComp = '';
+      for (let index = 0; index < (8 - nroComprobante.toString().length); index++) {
+        nroComp += '0'
+      }
+      nroComp += nroComprobante;
+      doc.text('Punto de Venta: 00001    Comp. Nro: ' + nroComp, (doc.internal.pageSize.width / 2) + 5, 35, 'left');
+      doc.text('Fecha de Emisión:  ' + fechaEmision, (doc.internal.pageSize.width / 2) + 5, 42, 'left');
+      doc.text('CUIT:  20379855068', (doc.internal.pageSize.width / 2) + 5, 52, 'left');
+      doc.text('Ingresos Brutos:  2037985506', (doc.internal.pageSize.width / 2) + 5, 59, 'left');
+      doc.text('Fecha de Inicio de Actividades:  01/12/2018', (doc.internal.pageSize.width / 2) + 5, 66, 'left');
+      //SEGUNDO RECTANGULO
+      let documentoCompleto = tipoDocumento + ': ' + nroDocumento;
+      doc.rect(10, 78, doc.internal.pageSize.width - 20, 11, 'S');
+      doc.text(documentoCompleto, 15, 85, 'left');
+      doc.text('Razón Social: ' + razonSocial, (doc.internal.pageSize.width / 2) + 5, 85, 'left');
+      //TITULOS DETALLES
+      doc.setFontSize(9);
+      doc.setDrawColor(0);
+      doc.setFillColor(169, 169, 169);
+      doc.rect(10, 91, doc.internal.pageSize.width - 20, 10, 'FD');
+      doc.text('Descripción', 20, 96, 'left');
+      doc.text('Cantidad', 85, 96, 'left');
+      doc.text('U. medida', 101.5, 96, 'left');
+      doc.text('Precio Unit.', 118, 96, 'left');
+      doc.text('  % Bonif.', 134.5, 96, 'left');
+      doc.text('Subtotal', 151, 96, 'left');
+      doc.text('Alic. Iva', 167.5, 96, 'left');
+      doc.text('Subt. c/IVA', 184, 96, 'left');
+      //DETALLES
+      doc.setFontSize(8);
+      let altura = 108;
+      array.forEach(element => {
+        if (element.descripcion.length > 50)
+          element.descripcion = element.descripcion.substring(0, 49);
+        doc.text(element.descripcion, 10, altura, 'left');
+        doc.text(element.cantidad.toString(), 96.5, altura, 'right');
+        doc.text('unidades', 110, altura, 'center');
+        doc.text((element.precio_detalle / element.cantidad).toString(), 129.5, altura, 'right');
+        doc.text('0.00', 146, altura, 'right');
+        doc.text('0.00', 162.5, altura, 'right');
+        doc.text(element.precio_detalle.toString(), 179, altura, 'right');
+        doc.text(element.precio_detalle.toString(), 198, altura, 'right');
+        altura += 4;
+      });
+      //RECTANGULO FINAL
+      doc.setFontSize(9);
+      doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
+      doc.text('Otros tributos', 11,225,'left');
+      doc.setFillColor(169, 169, 169);
+      doc.rect(11, 226, (doc.internal.pageSize.width / 2) - 3, 4, 'FD');
+      doc.text('Descripción                                                    Detalle   Alic. %   Importe',12,229,'left');
+      doc.text('Per./Ret de Impuesto a las Ganancias',12,233,'left');
+      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,233,'right')
+      doc.text('Per./Ret de Iva',12,237,'left');
+      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,237,'right')
+      doc.text('Per./Ret de Ingresos Brutos',12,241,'left');
+      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,241,'right')
+      doc.text('Impuestos Internos',12,245,'left');
+      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,245,'right')
+      doc.text('Impuestos Municipales',12,249,'left');
+      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,249,'right')
+      doc.text('Importe Otros Tributos: $',60,253,'left');
+      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,253,'right')
+
+      doc.text('Importe Neto Gravado: $', 172, 226, 'right');
+      doc.text(impTotal.toString(), 198, 226, 'right');
+      doc.text('Iva 27%: $', 172, 230, 'right');
+      doc.text(impTotal.toString(), 198, 230, 'right');
+      doc.text('Iva 21%: $', 172, 234, 'right');
+      doc.text(impTotal.toString(), 198, 234, 'right');
+      doc.text('Iva 10.5%: $', 172, 238, 'right');
+      doc.text(impTotal.toString(), 198, 238, 'right');
+      doc.text('Iva 5%: $', 172, 242, 'right');
+      doc.text(impTotal.toString(), 198, 242, 'right');
+      doc.text('Iva 2.5%: $', 172, 246, 'right');
+      doc.text(impTotal.toString(), 198, 246, 'right');
+      doc.text('Iva 0%: $', 172, 250, 'right');
+      doc.text(impTotal.toString(), 198, 250, 'right');
+      doc.text('Importe Otros Tributos: $', 172, 254, 'right');
+      doc.text(impTotal.toString(), 198, 254, 'right');
+      doc.text('Importe Total: $', 172, 258, 'right');
+      doc.text(impTotal.toString(), 198, 258, 'right');
+
+      //CAE Y FEC. VENC.
+      doc.setFontSize(11);
+      doc.text('CAE N°: ', 166, 266, 'right');
+      doc.text(nro_cae, 168, 266, 'left');
+      doc.text('Fecha de Vto. de CAE: ', 166, 273, 'right');
+      let fechaDividida = cae_fec_vto.split('-');
+      let fecha = fechaDividida[2] + '/' + fechaDividida[1] + '/' + fechaDividida[0];
+      doc.text(fecha, 168, 273, 'left');
+      if (index < cantHojas)
+        doc.addPage();
+    }
+    //PDF
+    doc.save('Test.pdf');
   }
 
   facturaPdf(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto, detallesVenta) {
