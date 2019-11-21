@@ -12,7 +12,7 @@ export class ClienteService {
   API_URI;
 
   constructor(private http : HttpClient, private globalService : GlobalService) { 
-    this.selectedCliente = new Cliente(null, null, null, null, null, null);
+    this.selectedCliente = new Cliente(null, null, null, null, null, null, null);
     this.API_URI = globalService.API_URI;
   }
 

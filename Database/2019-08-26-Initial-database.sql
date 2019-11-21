@@ -24,6 +24,8 @@ CREATE TABLE cliente (
     doc_tipo INT(2) NOT NULL,
     doc_nro BIGINT(14) NOT NULL UNIQUE,
     telefono VARCHAR(18) NULL,
+    cliente_responsable_inscripto BOOLEAN,
+    responsable_inscripto BOOLEAN DEFAULT true,
     FOREIGN KEY(doc_tipo) REFERENCES doc_tipo(id)
 );
 

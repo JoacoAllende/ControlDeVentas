@@ -3,7 +3,7 @@ const clienteCtrl = {};
 const mysqlConnection = require('../database');
 
 clienteCtrl.getClientes = (req, res) => {
-    const query = 'SELECT c.*, dt.descripcion FROM cliente c INNER JOIN doc_tipo dt ON (dt.id = c.doc_tipo) WHERE c.id != 1;';
+    const query = 'SELECT c.*, dt.descripcion FROM cliente c INNER JOIN doc_tipo dt ON (dt.id = c.doc_tipo) WHERE c.id != 1 ORDER BY nombre;';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
             res.json(rows);
@@ -14,7 +14,7 @@ clienteCtrl.getClientes = (req, res) => {
 };
 
 clienteCtrl.getAllClientes = (req, res) => {
-    const query = 'SELECT id, nombre FROM cliente;';
+    const query = 'SELECT id, nombre FROM cliente ORDER BY nombre;';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
             res.json(rows);
@@ -26,8 +26,8 @@ clienteCtrl.getAllClientes = (req, res) => {
 
 clienteCtrl.createCliente = (req, res) => {
     const cliente = req.body;
-    const query = 'INSERT INTO cliente (nombre, doc_tipo, doc_nro, telefono) VALUES ("' + cliente.nombre + '",' + cliente.doc_tipo
-    + ', ' + cliente.doc_nro + ', "' + cliente.telefono + '");';
+    const query = 'INSERT INTO cliente (nombre, doc_tipo, doc_nro, telefono, cliente_responsable_inscripto) VALUES ("' + cliente.nombre + '",' + cliente.doc_tipo
+    + ', ' + cliente.doc_nro + ', "' + cliente.telefono + '", ' + cliente.cliente_responsable_inscripto + ');';
     mysqlConnection.query(query, (err) => {
         if (!err) {
             res.json({
@@ -42,7 +42,7 @@ clienteCtrl.createCliente = (req, res) => {
 clienteCtrl.updateCliente = (req, res) => {
     const cliente = req.body;
     const query = 'UPDATE cliente SET nombre = "' + cliente.nombre + '", doc_tipo = ' + cliente.doc_tipo + ', doc_nro = ' +
-    cliente.doc_nro + ', telefono = "' + cliente.telefono + '" WHERE id = ' + cliente.id;
+    cliente.doc_nro + ', cliente_responsable_inscripto = ' + cliente.cliente_responsable_inscripto + ', telefono = "' + cliente.telefono + '" WHERE id = ' + cliente.id;
     mysqlConnection.query(query, (err) => {
         if (!err) {
             res.json({

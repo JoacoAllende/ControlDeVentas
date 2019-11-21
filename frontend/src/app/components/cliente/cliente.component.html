@@ -8,8 +8,9 @@
                     <th>Tipo documento</th>
                     <th class="numero">Nro. documento</th>
                     <th class="numero">Teléfono</th>
-                    <th *ngIf="edicion">Editar</th>
-                    <th *ngIf="edicion">Eliminar</th>
+                    <th class="numero">Resp. inscripto</th>
+                    <th class="numero" *ngIf="edicion">Editar</th>
+                    <th class="numero" *ngIf="edicion">Eliminar</th>
                 </thead>
                 <tbody>
                     <tr
@@ -18,10 +19,11 @@
                         <td>{{cliente.descripcion}}</td>
                         <td class="numero">{{cliente.doc_nro}}</td>
                         <td class="numero">{{cliente.telefono}}</td>
-                        <td><a (click)="editCliente(cliente)" *ngIf="edicion">
+                        <td class="numero">{{cliente.cliente_responsable_inscripto?'Si':'No'}}</td>
+                        <td class="numero"><a (click)="editCliente(cliente)" *ngIf="edicion">
                                 <i class="glyphicon glyphicon-pencil"></i>
                             </a></td>
-                        <td><a (click)="deleteCliente(cliente.id)" *ngIf="edicion">
+                        <td class="numero"><a (click)="deleteCliente(cliente.id)" *ngIf="edicion">
                                 <i class="glyphicon glyphicon-remove"></i>
                             </a></td>
                     </tr>
@@ -51,6 +53,13 @@
             <input type="number" class="form-control" name="doc_nro"
                 [(ngModel)]="clienteService.selectedCliente.doc_nro" #docNro="ngModel" placeholder="Nro. de documento"
                 required="required">
+        </div>
+        <div class="form-group">
+            <label for="responsable_inscripto">Responsable inscripto</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="cliente_responsable_inscripto"
+                [(ngModel)]="clienteService.selectedCliente.cliente_responsable_inscripto">
         </div>
         <div class="form-group">
             <label for="Telefono">Teléfono</label>

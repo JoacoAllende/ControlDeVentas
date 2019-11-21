@@ -38,6 +38,7 @@ INSERT INTO doc_tipo (id, descripcion) VALUES (86, 'CUIL');
 INSERT INTO doc_tipo (id, descripcion) VALUES (96, 'DNI');
 INSERT INTO doc_tipo (id, descripcion) VALUES (99, 'Doc. (Otro)');
 
-INSERT INTO cliente (nombre, doc_tipo, doc_nro) VALUES ('Consumidor final', 99, 0);
-INSERT INTO cliente (nombre, doc_tipo, doc_nro) VALUES ('Fernando Allende', 80, 20161379671);
-INSERT INTO cliente (nombre, doc_tipo, doc_nro) VALUES ('Claudia Gentil', 96, 17404217);
+INSERT INTO cliente (nombre, doc_tipo, doc_nro, cliente_responsable_inscripto) VALUES ('Consumidor final', 99, 0, false);
+INSERT INTO cliente (nombre, doc_tipo, doc_nro, cliente_responsable_inscripto) VALUES ('Fernando Allende', 80, 20161379671,true);
+INSERT INTO cliente (nombre, doc_tipo, doc_nro, cliente_responsable_inscripto) VALUES ('Claudia Gentil', 96, 17404217,false);
+INSERT INTO cliente (nombre, doc_tipo, doc_nro, cliente_responsable_inscripto, responsable_inscripto) VALUES ('Nano Allende', 80, 20441131411,false,false);

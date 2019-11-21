@@ -144,7 +144,7 @@ export class ClienteComponent implements OnInit {
   }
 
   editCliente(cliente: Cliente) {
-    this.clienteService.selectedCliente = new Cliente(cliente.id, cliente.nombre, cliente.doc_tipo, cliente.doc_nro, cliente.telefono, cliente.doc_descripcion);
+    this.clienteService.selectedCliente = new Cliente(cliente.id, cliente.nombre, cliente.doc_tipo, cliente.doc_nro, cliente.telefono, cliente.doc_descripcion, cliente.cliente_responsable_inscripto);
   }
 
   deleteCliente(id: number) {
