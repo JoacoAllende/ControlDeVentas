@@ -257,7 +257,7 @@ export class VentaComponent implements OnInit {
         const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
         this.facturaService.postFacturaAfipB(facturaAfipB)
           .subscribe(res => {
-            this.continuarFactura(res, tot);
+            this.continuarFactura(res, tot, alicuotasIva);
           })
       } else if (this.cbteTipoSelected == 1) {
         let alicuotasIva = new AlicuotasIva();
@@ -277,39 +277,16 @@ export class VentaComponent implements OnInit {
         impIva = Number(impIva.toFixed(2));
         impNeto = Number(impNeto.toFixed(2));
         const impTotal = Number((impIva + impNeto).toFixed(2));
-        const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
-        this.facturaService.postFacturaAfipB(facturaAfipB)
+        const facturaAfipA = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
+        this.facturaService.postFacturaAfipA(facturaAfipA)
           .subscribe(res => {
-            this.continuarFactura(res, tot);
-          })
-      } else if (this.cbteTipoSelected == 11) {
-        let alicuotasIva = new AlicuotasIva();
-        let impNeto = 0;
-        let impIva = 0;
-        this.detallesVenta.forEach(element => {
-          const coeficiente = (1 + element.alicuota / 100)
-          const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
-          const importe = Number((element.precio_detalle - baseImp).toFixed(2));
-          const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
-          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe; 
-          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp,importe + oldImporte);
-          impIva += importe;
-          impNeto += baseImp;
-        });
-        const newAlicuotasIva = alicuotasIva.Iva.filter(o => o.BaseImp !== 0);
-        impIva = Number(impIva.toFixed(2));
-        impNeto = Number(impNeto.toFixed(2));
-        const impTotal = Number((impIva + impNeto).toFixed(2));
-        const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
-        this.facturaService.postFacturaAfipB(facturaAfipB)
-          .subscribe(res => {
-            this.continuarFactura(res, tot);
+            this.continuarFactura(res, tot, alicuotasIva);
           })
       } else if (this.cbteTipoSelected == 11) {
         const facturaAfipC = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal, null, null);
         this.facturaService.postFacturaAfipC(facturaAfipC)
           .subscribe(res => {
-            this.continuarFactura(res, tot);
+            this.continuarFactura(res, tot, null);
           })
       }
       this.habilitarInicial();
@@ -317,7 +294,7 @@ export class VentaComponent implements OnInit {
 
   }
 
-  continuarFactura(res, tot) {
+  continuarFactura(res, tot, alicuotasIva) {
     const today = new Date();
     const fecha = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     const fechaEmisionPDF = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
@@ -334,7 +311,7 @@ export class VentaComponent implements OnInit {
                 this.detallesVenta = res as DetalleVenta[];
                 if (this.cbteTipoSelected == 1) {
                   this.facturaPdfA(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
-                    this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                    this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta, alicuotasIva);
                 } else {
                   this.facturaPdf(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
                     this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
@@ -390,7 +367,7 @@ export class VentaComponent implements OnInit {
     }
   }
 
-  facturaPdfA(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto, detallesVenta) {
+  facturaPdfA(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto, detallesVenta, alicuotasIva) {
     const doc = new jsPDF();
     const cantHojas = Math.floor(detallesVenta.length / 28);
     let array;
@@ -459,17 +436,18 @@ export class VentaComponent implements OnInit {
       //DETALLES
       doc.setFontSize(8);
       let altura = 108;
+      this.convertirDetallesSinIva(array);
       array.forEach(element => {
         if (element.descripcion.length > 50)
           element.descripcion = element.descripcion.substring(0, 49);
         doc.text(element.descripcion, 10, altura, 'left');
         doc.text(element.cantidad.toString(), 96.5, altura, 'right');
         doc.text('unidades', 110, altura, 'center');
-        doc.text((element.precio_detalle / element.cantidad).toString(), 129.5, altura, 'right');
+        doc.text((element.precio_detalleSinIva / element.cantidad).toFixed(2), 129.5, altura, 'right');
         doc.text('0.00', 146, altura, 'right');
-        doc.text('0.00', 162.5, altura, 'right');
-        doc.text(element.precio_detalle.toString(), 179, altura, 'right');
-        doc.text(element.precio_detalle.toString(), 198, altura, 'right');
+        doc.text(element.precio_detalleSinIva.toFixed(2), 162.5, altura, 'right');
+        doc.text(element.alicuota + '%', 179, altura, 'right');
+        doc.text(element.precio_detalle.toFixed(2), 198, altura, 'right');
         altura += 4;
       });
       //RECTANGULO FINAL
@@ -493,23 +471,23 @@ export class VentaComponent implements OnInit {
       doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,253,'right')
 
       doc.text('Importe Neto Gravado: $', 172, 226, 'right');
-      doc.text(impTotal.toString(), 198, 226, 'right');
+      doc.text(this.getImporteNeto(alicuotasIva).toFixed(2), 198, 226, 'right');
       doc.text('Iva 27%: $', 172, 230, 'right');
-      doc.text(impTotal.toString(), 198, 230, 'right');
+      doc.text(alicuotasIva.Iva.find(o => o.Id === 6).Importe.toFixed(2), 198, 230, 'right');
       doc.text('Iva 21%: $', 172, 234, 'right');
-      doc.text(impTotal.toString(), 198, 234, 'right');
+      doc.text(alicuotasIva.Iva.find(o => o.Id === 5).Importe.toFixed(2), 198, 234, 'right');
       doc.text('Iva 10.5%: $', 172, 238, 'right');
-      doc.text(impTotal.toString(), 198, 238, 'right');
+      doc.text(alicuotasIva.Iva.find(o => o.Id === 4).Importe.toFixed(2), 198, 238, 'right');
       doc.text('Iva 5%: $', 172, 242, 'right');
-      doc.text(impTotal.toString(), 198, 242, 'right');
+      doc.text(alicuotasIva.Iva.find(o => o.Id === 8).Importe.toFixed(2), 198, 242, 'right');
       doc.text('Iva 2.5%: $', 172, 246, 'right');
-      doc.text(impTotal.toString(), 198, 246, 'right');
+      doc.text(alicuotasIva.Iva.find(o => o.Id === 9).Importe.toFixed(2), 198, 246, 'right');
       doc.text('Iva 0%: $', 172, 250, 'right');
-      doc.text(impTotal.toString(), 198, 250, 'right');
+      doc.text(alicuotasIva.Iva.find(o => o.Id === 3).Importe.toFixed(2), 198, 250, 'right');
       doc.text('Importe Otros Tributos: $', 172, 254, 'right');
-      doc.text(impTotal.toString(), 198, 254, 'right');
+      doc.text('0,00', 198, 254, 'right');
       doc.text('Importe Total: $', 172, 258, 'right');
-      doc.text(impTotal.toString(), 198, 258, 'right');
+      doc.text(impTotal.toFixed(2), 198, 258, 'right');
 
       //CAE Y FEC. VENC.
       doc.setFontSize(11);
@@ -523,7 +501,23 @@ export class VentaComponent implements OnInit {
         doc.addPage();
     }
     //PDF
+    this.getImporteNeto(alicuotasIva);
     doc.save('Test.pdf');
+  }
+
+  convertirDetallesSinIva(array) {
+    array.forEach(element => {
+      const precio_detalleSinIva = Number((element.precio_detalle / (1 + element.alicuota / 100)).toFixed(2))
+      element.precio_detalleSinIva = precio_detalleSinIva;
+    });
+  }
+
+  getImporteNeto(alicuotasIva) {
+    let impNeto = 0;
+    alicuotasIva.Iva.forEach(element => {
+      impNeto += element.BaseImp;
+    });
+    return impNeto;
   }
 
   facturaPdf(tipoFactura, codFactura, nroComprobante, fechaEmision, tipoDocumento, nroDocumento, razonSocial, impTotal, nro_cae, cae_fec_vto, detallesVenta) {
@@ -598,23 +592,23 @@ export class VentaComponent implements OnInit {
         if (element.descripcion.length > 50)
           element.descripcion = element.descripcion.substring(0, 49);
         doc.text(element.descripcion, 10, altura, 'left');
-        doc.text(element.cantidad.toString(), 100, altura, 'right');
+        doc.text(element.cantidad.toFixed(2), 100, altura, 'right');
         doc.text('unidades', 115, altura, 'center');
-        doc.text((element.precio_detalle / element.cantidad).toString(), 140, altura, 'right');
+        doc.text((element.precio_detalle / element.cantidad).toFixed(2), 140, altura, 'right');
         doc.text('0.00', 160, altura, 'right');
         doc.text('0.00', 180, altura, 'right');
-        doc.text(element.precio_detalle.toString(), 198, altura, 'right');
+        doc.text(element.precio_detalle.toFixed(2), 198, altura, 'right');
         altura += 4;
       });
       //RECTANGULO FINAL
       doc.setFontSize(10);
       doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
       doc.text('Subtotal: $', 165, 230, 'right');
-      doc.text(impTotal.toString(), 198, 230, 'right');
+      doc.text(impTotal.toFixed(2), 198, 230, 'right');
       doc.text('Imp. Otros Tributos: $', 165, 240, 'right');
       doc.text('  0.00', 198, 240, 'right');
       doc.text('Importe Total: $', 165, 250, 'right');
-      doc.text(impTotal.toString(), 198, 250, 'right');
+      doc.text(impTotal.toFixed(2), 198, 250, 'right');
       //CAE Y FEC. VENC.
       doc.setFontSize(11);
       doc.text('CAE N°: ', 166, 266, 'right');

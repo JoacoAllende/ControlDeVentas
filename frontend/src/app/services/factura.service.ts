@@ -28,6 +28,10 @@ export class FacturaService {
     return this.http.post(`http://${this.API_URI}/facturacionAfipB/`, factura);
   }
 
+  postFacturaAfipA(factura : FacturaAfip){
+    return this.http.post(`http://${this.API_URI}/facturacionAfipA/`, factura);
+  }
+
   postFacturaLocal(factura : FacturaLocal){
     return this.http.post(`http://${this.API_URI}/facturacionLocal/`, factura);
   }

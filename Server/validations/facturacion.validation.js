@@ -10,6 +10,10 @@ factValidator.validar_createFacturaAfipB = async (req, res) => {
     factController.createFacturaAfipB(req, res);
 }
 
+factValidator.validar_createFacturaAfipA = async (req, res) => {
+    factController.createFacturaAfipA(req, res);
+}
+
 factValidator.validar_createFacturaLocal = async (req, res) => {
     factController.createFacturaLocal(req, res);
 }
