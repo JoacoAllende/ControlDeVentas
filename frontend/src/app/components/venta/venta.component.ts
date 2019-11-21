@@ -59,7 +59,7 @@ export class VentaComponent implements OnInit {
     { name: 'Factura B', value: 6 },
     { name: 'Factura C', value: 11 }
   ];
-  cbteTipoSelected = 1;
+  cbteTipoSelected;
   //FILTRO PIPE
   busquedaNombre: string;
 
@@ -211,13 +211,15 @@ export class VentaComponent implements OnInit {
 
   // FACTURACIÓN
 
-  comenzarFactura(id_venta, total, docTipo, docNro, facturado, razonSocial, id_cliente) {
+  comenzarFactura(id_venta, total, docTipo, docNro, facturado, razonSocial, id_cliente, cbteTipoSelected) {
     if (!facturado) {
+      this.edicion = false;
       this.total = total;
       this.id_venta = id_venta;
       this.docTipoSelected = docTipo;
       this.docNroSelected = docNro;
       this.razonSocialSelected = razonSocial;
+      this.cbteTipoSelected = this.seleccionarCbteTipoSelected(cbteTipoSelected);
       this.factura = true;
       this.clienteSelected = id_cliente;
       this.ventaService.getVentaDetalles(id_venta)
@@ -229,6 +231,18 @@ export class VentaComponent implements OnInit {
       alert('La venta ya ha sido facturada');
       this.factura = false;
       this.detallesVenta = [];
+    }
+  }
+
+  seleccionarCbteTipoSelected(value) {
+    if (value === '01') {
+      return 6;
+    }
+    else if (value === '11') {
+      return 1;
+    }
+    else {
+      return 11;
     }
   }
 
@@ -245,8 +259,8 @@ export class VentaComponent implements OnInit {
           const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
           const importe = Number((element.precio_detalle - baseImp).toFixed(2));
           const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
-          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe; 
-          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp,importe + oldImporte);
+          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe;
+          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp, importe + oldImporte);
           impIva += importe;
           impNeto += baseImp;
         });
@@ -268,8 +282,8 @@ export class VentaComponent implements OnInit {
           const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
           const importe = Number((element.precio_detalle - baseImp).toFixed(2));
           const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
-          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe; 
-          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp,importe + oldImporte);
+          const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe;
+          alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp, importe + oldImporte);
           impIva += importe;
           impNeto += baseImp;
         });
@@ -453,22 +467,22 @@ export class VentaComponent implements OnInit {
       //RECTANGULO FINAL
       doc.setFontSize(9);
       doc.rect(10, 220, doc.internal.pageSize.width - 20, 40, 'S');
-      doc.text('Otros tributos', 11,225,'left');
+      doc.text('Otros tributos', 11, 225, 'left');
       doc.setFillColor(169, 169, 169);
       doc.rect(11, 226, (doc.internal.pageSize.width / 2) - 3, 4, 'FD');
-      doc.text('Descripción                                                    Detalle   Alic. %   Importe',12,229,'left');
-      doc.text('Per./Ret de Impuesto a las Ganancias',12,233,'left');
-      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,233,'right')
-      doc.text('Per./Ret de Iva',12,237,'left');
-      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,237,'right')
-      doc.text('Per./Ret de Ingresos Brutos',12,241,'left');
-      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,241,'right')
-      doc.text('Impuestos Internos',12,245,'left');
-      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,245,'right')
-      doc.text('Impuestos Municipales',12,249,'left');
-      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,249,'right')
-      doc.text('Importe Otros Tributos: $',60,253,'left');
-      doc.text('0,00',(doc.internal.pageSize.width / 2) + 5,253,'right')
+      doc.text('Descripción                                                    Detalle   Alic. %   Importe', 12, 229, 'left');
+      doc.text('Per./Ret de Impuesto a las Ganancias', 12, 233, 'left');
+      doc.text('0,00', (doc.internal.pageSize.width / 2) + 5, 233, 'right')
+      doc.text('Per./Ret de Iva', 12, 237, 'left');
+      doc.text('0,00', (doc.internal.pageSize.width / 2) + 5, 237, 'right')
+      doc.text('Per./Ret de Ingresos Brutos', 12, 241, 'left');
+      doc.text('0,00', (doc.internal.pageSize.width / 2) + 5, 241, 'right')
+      doc.text('Impuestos Internos', 12, 245, 'left');
+      doc.text('0,00', (doc.internal.pageSize.width / 2) + 5, 245, 'right')
+      doc.text('Impuestos Municipales', 12, 249, 'left');
+      doc.text('0,00', (doc.internal.pageSize.width / 2) + 5, 249, 'right')
+      doc.text('Importe Otros Tributos: $', 60, 253, 'left');
+      doc.text('0,00', (doc.internal.pageSize.width / 2) + 5, 253, 'right')
 
       doc.text('Importe Neto Gravado: $', 172, 226, 'right');
       doc.text(this.getImporteNeto(alicuotasIva).toFixed(2), 198, 226, 'right');

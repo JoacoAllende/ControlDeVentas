@@ -39,7 +39,7 @@ ventaCtrl.createVenta = (req, res) => {
 
 ventaCtrl.getVentasFecha = (req, res) => {
     const fecha = req.params.fecha;
-    const query = 'SELECT c.nombre AS cliente, v.id AS id_venta, c.doc_tipo, c.doc_nro, v.* FROM venta AS v INNER JOIN cliente AS c ON (c.id = v.id_cliente) WHERE fecha = "'
+    const query = 'SELECT c.nombre AS cliente, CONCAT(c.cliente_responsable_inscripto,responsable_inscripto) AS cbteTipoSelected, v.id AS id_venta, c.doc_tipo, c.doc_nro, v.* FROM venta AS v INNER JOIN cliente AS c ON (c.id = v.id_cliente) WHERE fecha = "'
         + fecha + '"';
     mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
