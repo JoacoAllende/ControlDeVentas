@@ -98,27 +98,31 @@
     <div *ngIf="factura">
         <form role="form" #facturaForm="ngForm" name='facturaForm' standalone>
             <label for="tipoFactura">Tipo de factura</label>
-            <div class="select">
-                <select [(ngModel)]="cbteTipoSelected" name="cbteTipoSelected" required>
-                    <option *ngFor="let cbteTipo of cbteTipos" [value]="cbteTipo.value">{{cbteTipo.name}}</option>
-                </select>
+            <div>
+                <input type="text" name="cbteTipoSelected" placeholder="Tipo de factura" readonly
+                    [(ngModel)]="cbteTipoSelected">
             </div>
             <label for="tipoDocumento">Tipo de documento</label>
-            <div class="select">
-                <select [(ngModel)]="docTipoSelected" name="docTipoSelected" required aria-readonly="true">
-                    <option *ngFor="let docTipo of docTipos" [value]="docTipo.value">{{docTipo.name}}</option>
-                </select>
+            <div>
+                <input type="text" name="tipoDocumento" placeholder="Tipo de documento" readonly
+                    [(ngModel)]="docTipoSelected">
             </div>
-            <label for="tipoDocumento">Nro. de documento</label>
+            <label for="nroDocumento">Nro. de documento</label>
             <div>
                 <input type="number" name="dniNro" placeholder="Nro Documento" readonly [(ngModel)]="docNroSelected"
                     required>
             </div>
-            <label for="tipoDocumento">Importe Neto</label>
+            <label for="impNeto">Importe Neto Gravado</label>
             <div>
-                <input type="number" name="impNeto" placeholder="Imp. Neto" readonly [(ngModel)]="total">
+                <input type="number" name="impNeto" placeholder="Imp. Neto" readonly [(ngModel)]="impNeto">
             </div>
-            <label for="tipoDocumento">Importe Total</label>
+            <div *ngIf="iva">
+                <label for="impIva">Importe total de IVA</label>
+                <div>
+                    <input type="number" name="impIva" placeholder="Imp. Iva" readonly [(ngModel)]="impIva">
+                </div>
+            </div>
+            <label for="impTotal">Importe Total del comprobante</label>
             <div>
                 <input type="number" name="impTotal" placeholder="Imp. Total" readonly [(ngModel)]="total">
             </div>

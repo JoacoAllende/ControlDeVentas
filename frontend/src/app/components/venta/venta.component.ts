@@ -38,6 +38,8 @@ export class VentaComponent implements OnInit {
   codigo: number;
   cantidad: number;
   total: number = 0;
+  impIva: number;
+  impNeto: number;
   id_venta;
   fecha;
   clienteSelected = 1;
@@ -45,6 +47,7 @@ export class VentaComponent implements OnInit {
   actualPageVentas: number = 1;
   actualPageDetalles: number = 1;
   //FACTURACION
+  iva;
   docTipos: any[] = [
     { name: 'CUIT', value: 80 },
     { name: 'CUIL', value: 86 },
@@ -216,22 +219,55 @@ export class VentaComponent implements OnInit {
       this.edicion = false;
       this.total = total;
       this.id_venta = id_venta;
-      this.docTipoSelected = docTipo;
+      this.docTipoSelected = this.docTipos.find(o => o.value === docTipo).name;
       this.docNroSelected = docNro;
       this.razonSocialSelected = razonSocial;
-      this.cbteTipoSelected = this.seleccionarCbteTipoSelected(cbteTipoSelected);
+      const cbteTipo = this.seleccionarCbteTipoSelected(cbteTipoSelected);
+      this.cbteTipoSelected = this.cbteTipos.find(o => o.value === cbteTipo).name;
+      this.setearIva(cbteTipo);
       this.factura = true;
       this.clienteSelected = id_cliente;
       this.ventaService.getVentaDetalles(id_venta)
         .subscribe(res => {
           this.detallesVenta = res as DetalleVenta[];
           this.id_venta = id_venta;
+          this.calcularImpIvaYNeto(cbteTipo);
         })
     } else {
       alert('La venta ya ha sido facturada');
       this.factura = false;
       this.detallesVenta = [];
     }
+  }
+
+  calcularImpIvaYNeto(cbteTipoSelected) {
+    if (cbteTipoSelected == 11) {
+      this.impIva = 0;
+      this.impNeto = this.total;
+    } else {
+      let alicuotasIva = new AlicuotasIva();
+      let impNeto = 0;
+      let impIva = 0;
+      this.detallesVenta.forEach(element => {
+        const coeficiente = (1 + element.alicuota / 100)
+        const baseImp = Number((element.precio_detalle / coeficiente).toFixed(2));
+        const importe = Number((element.precio_detalle - baseImp).toFixed(2));
+        const oldBaseImp = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).BaseImp;
+        const oldImporte = alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).Importe;
+        alicuotasIva.Iva.find(o => o.Id === element.id_alicuota).addDetalle(baseImp + oldBaseImp, importe + oldImporte);
+        impIva += importe;
+        impNeto += baseImp;
+      });
+      this.impIva = Number(impIva.toFixed(2));
+      this.impNeto = Number(impNeto.toFixed(2));
+    }
+  }
+
+  setearIva(cbteTipoSelected) {
+    if (cbteTipoSelected == 11)
+      this.iva = false;
+    else
+      this.iva = true;
   }
 
   seleccionarCbteTipoSelected(value) {
@@ -248,9 +284,9 @@ export class VentaComponent implements OnInit {
 
   facturar(form: NgForm) {
     if (confirm('Desea realizar la factura?')) {
-      let tot = form.value.impTotal;
-      this.cbteTipoSelected = form.value.cbteTipoSelected;
-      if (this.cbteTipoSelected == 6) {
+      const tot = form.value.impTotal;
+      const cbteTipoSelected = this.cbteTipos.find(o => o.name === this.cbteTipoSelected).value;
+      if (cbteTipoSelected == 6) {
         let alicuotasIva = new AlicuotasIva();
         let impNeto = 0;
         let impIva = 0;
@@ -268,12 +304,12 @@ export class VentaComponent implements OnInit {
         impIva = Number(impIva.toFixed(2));
         impNeto = Number(impNeto.toFixed(2));
         const impTotal = Number((impIva + impNeto).toFixed(2));
-        const facturaAfipB = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
+        const facturaAfipB = new FacturaAfip(cbteTipoSelected, this.docTipos.find(o => o.name === this.docTipoSelected).value, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
         this.facturaService.postFacturaAfipB(facturaAfipB)
           .subscribe(res => {
             this.continuarFactura(res, tot, alicuotasIva);
           })
-      } else if (this.cbteTipoSelected == 1) {
+      } else if (cbteTipoSelected == 1) {
         let alicuotasIva = new AlicuotasIva();
         let impNeto = 0;
         let impIva = 0;
@@ -291,13 +327,13 @@ export class VentaComponent implements OnInit {
         impIva = Number(impIva.toFixed(2));
         impNeto = Number(impNeto.toFixed(2));
         const impTotal = Number((impIva + impNeto).toFixed(2));
-        const facturaAfipA = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
+        const facturaAfipA = new FacturaAfip(cbteTipoSelected, this.docTipos.find(o => o.name === this.docTipoSelected).value, form.value.dniNro, impTotal, impNeto, impIva, newAlicuotasIva);
         this.facturaService.postFacturaAfipA(facturaAfipA)
           .subscribe(res => {
             this.continuarFactura(res, tot, alicuotasIva);
           })
-      } else if (this.cbteTipoSelected == 11) {
-        const facturaAfipC = new FacturaAfip(form.value.cbteTipoSelected, form.value.docTipoSelected, form.value.dniNro, form.value.impNeto, form.value.impTotal, null, null);
+      } else if (cbteTipoSelected == 11) {
+        const facturaAfipC = new FacturaAfip(cbteTipoSelected, this.docTipos.find(o => o.name === this.docTipoSelected).value, form.value.dniNro, form.value.impNeto, form.value.impTotal, null, null);
         this.facturaService.postFacturaAfipC(facturaAfipC)
           .subscribe(res => {
             this.continuarFactura(res, tot, null);
@@ -313,9 +349,10 @@ export class VentaComponent implements OnInit {
     const fecha = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     const fechaEmisionPDF = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
     const nroComprobante = res['voucherNumber'];
-    let nro_cae = res['CAE'];
-    let cae_fec_vto = res['CAEFchVto'];
-    const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, this.cbteTipoSelected, 1, nroComprobante, this.clienteSelected, tot);
+    const nro_cae = res['CAE'];
+    const cae_fec_vto = res['CAEFchVto'];
+    const cbteTipoSelected = this.cbteTipos.find(o => o.name === this.cbteTipoSelected).value
+    const facturaLocal = new FacturaLocal(this.id_venta, nro_cae, fecha, cbteTipoSelected, 1, nroComprobante, this.clienteSelected, tot);
     this.facturaService.postFacturaLocal(facturaLocal)
       .subscribe(res => {
         this.ventaService.putVenta(this.id_venta)
@@ -323,12 +360,12 @@ export class VentaComponent implements OnInit {
             this.ventaService.getVentaDetalles(this.id_venta)
               .subscribe(res => {
                 this.detallesVenta = res as DetalleVenta[];
-                if (this.cbteTipoSelected == 1) {
-                  this.facturaPdfA(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
-                    this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta, alicuotasIva);
+                if (cbteTipoSelected == 1) {
+                  this.facturaPdfA(this.cbteTipoSelected, cbteTipoSelected, nroComprobante, fechaEmisionPDF,
+                    this.docTipoSelected, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta, alicuotasIva);
                 } else {
-                  this.facturaPdf(this.cbteTipos.find(o => o.value == this.cbteTipoSelected).name, this.cbteTipoSelected, nroComprobante, fechaEmisionPDF,
-                    this.docTipos.find(o => o.value === this.docTipoSelected).name, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
+                  this.facturaPdf(this.cbteTipoSelected, cbteTipoSelected, nroComprobante, fechaEmisionPDF,
+                    this.docTipoSelected, this.docNroSelected, this.razonSocialSelected, tot, nro_cae, cae_fec_vto, this.detallesVenta);
                 }
                 this.factura = false;
                 this.edicion = false;
