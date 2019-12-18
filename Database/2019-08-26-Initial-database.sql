@@ -71,3 +71,9 @@ CREATE TABLE factura (
     FOREIGN KEY (id_cliente) REFERENCES cliente(id),
     FOREIGN KEY (cbte_tipo) REFERENCES cbte_tipo(id)
 );
+
+CREATE TABLE usuario (
+    id INT(2) AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    contraseña VARCHAR(255) NOT NULL
+);

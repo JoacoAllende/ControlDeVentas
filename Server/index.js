@@ -21,6 +21,7 @@ app.use(require('./routes/producto.routes'));
 app.use(require('./routes/venta.routes'));
 app.use(require('./routes/facturacion.routes'));
 app.use(require('./routes/cliente.routes'));
+app.use(require('./routes/usuario.routes'));
 
 // Starting the server
 
