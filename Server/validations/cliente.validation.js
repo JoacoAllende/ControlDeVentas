@@ -1,65 +1,97 @@
 const clienteValidator = {};
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = 'TheSecretKey';
 
 const clienteController = require('../controllers/cliente.controller');
 
 clienteValidator.validar_createCliente = (req, res) => {
-    const cliente = req.body;
-    const doc_tipo = cliente.doc_tipo;
-    const doc_nro = cliente.doc_nro;
-    let clienteValido = false;
-    if (doc_tipo == 80 || doc_tipo == 86) {
-        if (CuitCuilValido(doc_nro)) {
-            clienteController.createCliente(req, res);
-            clienteValido = true;
+    jwt.verify(req.token, SECRET_KEY, (err) => {
+        if (!err) {
+            const cliente = req.body;
+            const doc_tipo = cliente.doc_tipo;
+            const doc_nro = cliente.doc_nro;
+            let clienteValido = false;
+            if (doc_tipo == 80 || doc_tipo == 86) {
+                if (CuitCuilValido(doc_nro)) {
+                    clienteController.createCliente(req, res);
+                    clienteValido = true;
+                }
+            } else if (doc_tipo == 96) {
+                if (dniValido(doc_nro)) {
+                    clienteController.createCliente(req, res);
+                    clienteValido = true;
+                }
+            }
+            if (!clienteValido)
+                res.json('Invalid client');
+        } else {
+            res.sendStatus(403);
         }
-    } else if (doc_tipo == 96) {
-        if (dniValido(doc_nro)) {
-            clienteController.createCliente(req, res);
-            clienteValido = true;
-        }
-    }
-    if (!clienteValido)
-        res.json('Invalid client');
+    })
 }
 
 clienteValidator.validar_getClientes = (req, res) => {
-    clienteController.getClientes(req, res);
+    jwt.verify(req.token, SECRET_KEY, (err) => {
+        if (!err) {
+            clienteController.getClientes(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    })
 }
 
 clienteValidator.validar_getAllClientes = (req, res) => {
-    clienteController.getAllClientes(req, res);
+    jwt.verify(req.token, SECRET_KEY, (err) => {
+        if (!err) {
+            clienteController.getAllClientes(req, res);
+        } else {
+            res.sendStatus(403);
+        }
+    })
 }
 
 clienteValidator.validar_deleteCliente = (req, res) => {
-    const id = req.params.id;
-    if (!isNaN(id)) {
-        clienteController.deleteCliente(req, res);
-    }
-    else
-        res.json('error');
+    jwt.verify(req.token, SECRET_KEY, (err) => {
+        if (!err) {
+            const id = req.params.id;
+            if (!isNaN(id)) {
+                clienteController.deleteCliente(req, res);
+            }
+            else
+                res.json('error');
+        } else {
+            res.sendStatus(403);
+        }
+    })
 }
 
 clienteValidator.validar_updateCliente = (req, res) => {
-    const cliente = req.body;
-    let clienteValido = false;
-    const id = cliente.id;
-    if (!isNaN(id)) {
-        const doc_tipo = cliente.doc_tipo;
-        const doc_nro = cliente.doc_nro;
-        if (doc_tipo == 80 || doc_tipo == 86) {
-            if (CuitCuilValido(doc_nro)) {
-                clienteController.updateCliente(req, res);
-                clienteValido = true;
+    jwt.verify(req.token, SECRET_KEY, (err) => {
+        if (!err) {
+            const cliente = req.body;
+            let clienteValido = false;
+            const id = cliente.id;
+            if (!isNaN(id)) {
+                const doc_tipo = cliente.doc_tipo;
+                const doc_nro = cliente.doc_nro;
+                if (doc_tipo == 80 || doc_tipo == 86) {
+                    if (CuitCuilValido(doc_nro)) {
+                        clienteController.updateCliente(req, res);
+                        clienteValido = true;
+                    }
+                } else if (doc_tipo == 96) {
+                    if (dniValido(doc_nro)) {
+                        clienteController.updateCliente(req, res);
+                        clienteValido = true;
+                    }
+                }
             }
-        } else if (doc_tipo == 96) {
-            if (dniValido(doc_nro)) {
-                clienteController.updateCliente(req, res);
-                clienteValido = true;
-            }
+            if (!clienteValido)
+                res.json('Invalid client');
+        } else {
+            res.sendStatus(403);
         }
-    }
-    if (!clienteValido)
-        res.json('Invalid client');
+    })
 }
 
 CuitCuilValido = (cuit) => {

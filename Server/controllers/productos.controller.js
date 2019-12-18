@@ -1,113 +1,75 @@
 const productoCtrl = {};
-const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'TheSecretKey';
 
 const mysqlConnection = require('../database');
 
 productoCtrl.getProductos = (req, res) => {
-    jwt.verify(req.token, SECRET_KEY, (err) => {
+    const query = 'SELECT p.*, a.valor AS alicuota FROM producto AS p INNER JOIN alicuota AS a ON (a.id = p.id_alicuota) ORDER BY p.descripcion';
+    mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
-            const query = 'SELECT p.*, a.valor AS alicuota FROM producto AS p INNER JOIN alicuota AS a ON (a.id = p.id_alicuota) ORDER BY p.descripcion';
-            mysqlConnection.query(query, (err, rows, fields) => {
-                if (!err) {
-                    res.json(rows);
-                } else {
-                    console.log(err);
-                }
-            })
+            res.json(rows);
         } else {
-            res.sendStatus(403);
+            console.log(err);
         }
     })
 };
 
 productoCtrl.getProducto = (req, res) => {
-    jwt.verify(req.token, SECRET_KEY, (err) => {
+    const codigo = req.params.codigo;
+    const query = 'SELECT * FROM producto WHERE codigo = ' + codigo;
+    mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
-            const codigo = req.params.codigo;
-            const query = 'SELECT * FROM producto WHERE codigo = ' + codigo;
-            mysqlConnection.query(query, (err, rows, fields) => {
-                if (!err) {
-                    res.json(rows);
-                } else {
-                    console.log(err);
-                }
-            })
+            res.json(rows);
         } else {
-            res.sendStatus(403);
+            console.log(err);
         }
     })
 };
 
 productoCtrl.createProducto = (req, res) => {
-    jwt.verify(req.token, SECRET_KEY, (err) => {
+    const producto = req.body;
+    const query = 'INSERT INTO producto (codigo, descripcion, precio, id_alicuota) VALUES ("' + producto.codigo + '","' + producto.descripcion
+        + '", ' + producto.precio + ', ' + producto.alicuotaSelected + ');';
+    mysqlConnection.query(query, (err) => {
         if (!err) {
-            const producto = req.body;
-            const query = 'INSERT INTO producto (codigo, descripcion, precio, id_alicuota) VALUES ("' + producto.codigo + '","' + producto.descripcion
-            + '", ' + producto.precio + ', ' + producto.alicuotaSelected + ');';
-            mysqlConnection.query(query, (err) => {
-                if (!err) {
-                    res.json({
-                        'status' : 'created'
-                    })
-                } else {
-                    res.json(err.errno);
-                }
+            res.json({
+                'status': 'created'
             })
         } else {
-            res.sendStatus(403);
+            res.json(err.errno);
         }
     })
 };
 
 productoCtrl.updateProducto = (req, res) => {
-    jwt.verify(req.token, SECRET_KEY, (err) => {
+    const producto = req.body;
+    const query = 'UPDATE producto SET codigo = "' + producto.codigo + '", descripcion = "' + producto.descripcion + '", precio = ' +
+        producto.precio + ', id_alicuota = ' + producto.alicuotaSelected + ' WHERE id = ' + producto.id;
+    mysqlConnection.query(query, (err) => {
         if (!err) {
-            const producto = req.body;
-            const query = 'UPDATE producto SET codigo = "' + producto.codigo + '", descripcion = "' + producto.descripcion + '", precio = ' +
-            producto.precio + ', id_alicuota = ' + producto.alicuotaSelected + ' WHERE id = ' + producto.id;
-            mysqlConnection.query(query, (err) => {
-                if (!err) {
-                    res.json({
-                        'status' : 'updated'
-                    })
-                } else {
-                    res.json(err.errno);
-                }
+            res.json({
+                'status': 'updated'
             })
         } else {
-            res.sendStatus(403);
+            res.json(err.errno);
         }
     })
 };
 
 productoCtrl.deleteProducto = (req, res) => {
-    jwt.verify(req.token, SECRET_KEY, (err) => {
-        if (!err) {
-            const id = req.params.id;
-            const query = 'DELETE FROM producto WHERE id = ' + id;
-            mysqlConnection.query(query, () =>{
-                res.json('deleted');
-            })
-        } else {
-            res.sendStatus(403);
-        }
+    const id = req.params.id;
+    const query = 'DELETE FROM producto WHERE id = ' + id;
+    mysqlConnection.query(query, () => {
+        res.json('deleted');
     })
 };
 
 productoCtrl.getProductosAlicuotas = (req, res) => {
-    jwt.verify(req.token, SECRET_KEY, (err) => {
+    const query = 'SELECT * FROM alicuota ORDER BY valor;';
+    mysqlConnection.query(query, (err, rows, fields) => {
         if (!err) {
-            const query = 'SELECT * FROM alicuota ORDER BY valor;';
-            mysqlConnection.query(query, (err, rows, fields) => {
-                if (!err) {
-                    res.json(rows);
-                } else {
-                    console.log(err);
-                }
-            })
+            res.json(rows);
         } else {
-            res.sendStatus(403);
+            console.log(err);
         }
     })
 };
