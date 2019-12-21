@@ -21,6 +21,7 @@ import { VentaComponent } from './components/venta/venta.component';
 import { FacturaComponent } from './components/factura/factura.component';
 import { ClienteComponent } from './components/cliente/cliente.component';
 import { VentaFilterCodigoPipe } from './components/venta/venta-filter-nombre.pipe';
+import { LoginComponent } from './components/login/login.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { VentaFilterCodigoPipe } from './components/venta/venta-filter-nombre.pi
     MainNavComponent,
     VentaComponent,
     FacturaComponent,
-    ClienteComponent
+    ClienteComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

@@ -26,9 +26,7 @@ usarioCtrl.loginUser = (req, res) => {
         if (!err) {
             const logUser = rows[0];
             if (logUser != undefined) {
-                console.log(logUser.contraseña);
-                console.log(usuario.contraseña);
-                const resultPassword = bcrypt.compareSync(usuario.contraseña, logUser.contraseña);
+                const resultPassword = bcrypt.compareSync(usuario.password, logUser.contraseña);
                 if (resultPassword) {
                     const id = logUser['id'];
                     const expiresIn = 4 * 60 * 60;
